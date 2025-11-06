@@ -9,7 +9,6 @@ linter:
     prefer_final_locals: true
     prefer_const_constructors: true
     prefer_const_literals_to_create_immutables: true
-    sort_constructors_first: true
     unnecessary_this: true
 
     # ⚙️ 안정성과 가독성
