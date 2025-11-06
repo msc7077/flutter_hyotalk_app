@@ -1,48 +1,85 @@
-# Miscellaneous
+# ===============================
+# 🧩 공통 / 시스템 관련
+# ===============================
 *.class
 *.log
 *.pyc
 *.swp
 .DS_Store
 .atom/
-.build/
 .buildlog/
 .history
 .svn/
-.swiftpm/
-migrate_working_dir/
 
-# IntelliJ related
+# ===============================
+# 🧱 IDE 관련 (IntelliJ / Android Studio / VSCode)
+# ===============================
 *.iml
 *.ipr
 *.iws
 .idea/
+.vscode/*
+!.vscode/settings.json
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# ===============================
+# 🐦 Flutter / Dart / Pub 관련
+# ===============================
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
-/build/
-/coverage/
+build/
+**/doc/api/
+**/ios/Flutter/.last_build_id
 
-# Symbolication related
+# ===============================
+# 🌐 Web 관련
+# ===============================
+lib/generated_plugin_registrant.dart
+
+# ===============================
+# 🧩 심볼 / 난독화 관련
+# ===============================
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# ===============================
+# 🤖 Android 관련
+# ===============================
 /android/app/debug
 /android/app/profile
 /android/app/release
+/local.properties
 
-# FVM Version Cache
+# ===============================
+# 🍎 iOS 관련
+# ===============================
+/ios/Pods/
+/ios/Podfile.lock
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/AppFrameworkInfo.plist
+/ios/Flutter/flutter_export_environment.sh
+/ios/.symlinks/
+/ios/Flutter/.last_build_id
+/ios/build/
+
+# ===============================
+# 🧰 환경 변수 / 시크릿 키 관련
+# ===============================
+.env
+.env.*
+firebase_options.dart
+
+# ===============================
+# 🧪 Flutter DevTools 관련
+# ===============================
+devtools_options.yaml
+
+# ===============================
+# 🧱 FVM 관련
+# ===============================
 .fvm/
+.flutter-version
