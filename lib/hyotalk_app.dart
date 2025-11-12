@@ -14,13 +14,9 @@ class HyotalkApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'Hyotalk App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      routerConfig: router,
     );
   }
 }
