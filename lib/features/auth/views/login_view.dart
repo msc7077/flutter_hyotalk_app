@@ -18,7 +18,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
+    _passwordController.disposess();
     super.dispose();
   }
 
@@ -107,13 +107,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: authState.isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('로그인'),
+                child:
+                    authState.isLoading
+                        ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Text('로그인'),
               ),
               const SizedBox(height: 16),
               Text(
