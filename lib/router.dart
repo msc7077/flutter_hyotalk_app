@@ -2,7 +2,7 @@ import 'package:flutter_hyotalk_app/features/auth/providers/auth_provider.dart';
 import 'package:flutter_hyotalk_app/features/auth/views/login_view.dart';
 import 'package:flutter_hyotalk_app/features/home/home_view.dart';
 import 'package:flutter_hyotalk_app/features/splash/providers/splash_provider.dart';
-import 'package:flutter_hyotalk_app/features/splash/splash_view.dart';
+import 'package:flutter_hyotalk_app/features/splash/view/splash_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
