@@ -18,7 +18,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.disposess();
+    _passwordController.dispose();
     super.dispose();
   }
 

@@ -1,5 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// 스플래시 초기화 로직을 담당하는 FutureProvider
+final splashInitProvider = FutureProvider.autoDispose<void>((ref) async {
+  // 최소 스플래시 표시 시간 대기
+  await Future.delayed(const Duration(seconds: 2));
+});
+
 /// 스플래시 화면 표시 여부를 관리하는 Notifier
 ///
 /// ## 목적:

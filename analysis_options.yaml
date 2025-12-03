@@ -24,12 +24,25 @@ linter:
     constant_identifier_names: false
     file_names: true
 
+    # 🕵️ 사용되지 않는 코드 감지 (Public 멤버 포함)
+    unreachable_from_main: true
+
 analyzer:
   errors:
     # 필요 시 경고/에러 레벨 조정
     avoid_print: info
     missing_return: error
-    dead_code: warning
+    dead_code: error
+    # 사용하지 않는 변수나 함수 감지 (단, Public 멤버는 제외된다. _를 붙여 Private 멤버로 처리를 습관화하길)
+    unused_local_variable: error
+    unused_element: error
+    unused_field: error
+    unused_import: error
+    unused_catch_clause: error
+    unused_catch_stack: error
+    unused_shown_name: error
+    unused_label: error
+    unreachable_from_main: error
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"

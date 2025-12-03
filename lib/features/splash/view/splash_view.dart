@@ -13,70 +13,73 @@ import 'package:go_router/go_router.dart';
 /// - 인증 상태 확인 후 적절한 화면으로 자동 이동
 ///
 /// ## 동작 흐름:
-/// 1. 위젯이 생성되면 즉시 _navigateToNextScreen() 실행
-/// 2. 2초 대기 (최소 표시 시간)
-/// 3. splashShown 플래그를 true로 설정 (이후 스플래시로 다시 오지 않도록)
-/// 4. 인증 상태 확인
-/// 5. 로그인 상태면 '/' (홈), 비로그인 상태면 '/login'으로 이동
-/// 6. context.replace() 사용으로 뒤로가기 시 스플래시로 돌아가지 않도록 함
-class SplashView extends ConsumerStatefulWidget {
+/// 1. splashInitProvider를 watch하여 초기화 로직 시작
+/// 2. ref.listen으로 초기화 상태 감지
+/// 3. 성공 시 -> 홈/로그인 화면으로 이동
+/// 4. 실패 시 -> 에러 다이얼로그 표시
+class SplashView extends ConsumerWidget {
   const SplashView({super.key});
 
-  @override
-  ConsumerState<SplashView> createState() => _SplashViewState();
-}
-
-class _SplashViewState extends ConsumerState<SplashView> {
-  @override
-  void initState() {
-    super.initState();
-    // 위젯이 생성되면 즉시 다음 화면으로 이동하는 로직 시작
-    _navigateToNextScreen();
-  }
-
-  /// 다음 화면으로 이동하는 비동기 함수
-  ///
-  /// 실행 순서:
-  /// 1. 2초 대기 (스플래시 최소 표시 시간)
-  /// 2. splashShown 플래그를 true로 설정
-  /// 3. 인증 상태 확인
-  /// 4. 적절한 화면으로 replace 이동
-  Future<void> _navigateToNextScreen() async {
-    // 최소 스플래시 표시 시간 (너무 빠르게 사라지는 것 방지)
-    // 사용자가 앱 로고와 이름을 인지할 수 있는 시간 확보
-    await Future.delayed(const Duration(seconds: 2));
-
-    // 위젯이 아직 마운트되어 있는지 확인 (메모리 누수 방지)
-    if (!mounted) return;
-
+  /// 다음 화면으로 이동 처리
+  void _navigateToNextScreen(BuildContext context, WidgetRef ref) {
     // [중요] 스플래시가 표시되었음을 기록
-    // - 이 플래그가 true가 되면 라우터의 redirect 로직에서
-    //   더 이상 스플래시로 리다이렉트하지 않음
-    // - 로그인/로그아웃 시에도 스플래시를 거치지 않고 직접 이동
     ref.read(splashShownProvider.notifier).markAsShown();
 
     // 현재 인증 상태 확인
     final authState = ref.read(authProvider);
-    final isAuthenticated = authState.isAuthenticated;
-
-    // 다시 한 번 마운트 상태 확인 (비동기 작업 중 위젯이 dispose될 수 있음)
-    if (!mounted) return;
 
     // 인증 상태에 따라 적절한 화면으로 이동
-    // context.replace() 사용 이유:
-    // - 뒤로가기 시 스플래시로 돌아가지 않도록 하기 위함
-    // - 스플래시는 앱 최초 실행 시에만 보여야 하므로
-    if (isAuthenticated) {
-      // 로그인 상태 → 홈 화면으로
+    if (authState.isAuthenticated) {
       context.replace('/');
     } else {
-      // 비로그인 상태 → 로그인 화면으로
       context.replace('/login');
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // splashInitProvider를 watch하여 로직 실행 (UI에 직접적인 영향은 없음)
+    // 하지만 watch를 해야 provider가 active 상태가 되어 로직이 돔
+    ref.watch(splashInitProvider);
+
+    // Provider 상태 변화 감지 (Side Effect 처리)
+    ref.listen(splashInitProvider, (previous, next) {
+      print('previous: $previous');
+      print('next: $next');
+      next.when(
+        data: (_) {
+          print('success');
+          // 초기화 성공 시 화면 이동
+          _navigateToNextScreen(context, ref);
+        },
+        error: (error, stackTrace) {
+          print('error: $error');
+          // 초기화 실패 시 에러 다이얼로그 표시 (예: 로딩 실패 등)
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder:
+                (context) => AlertDialog(
+                  title: const Text('오류 발생'),
+                  content: Text('알 수 없는 오류가 발생했습니다.\n$error'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        // 재시도 로직을 넣거나 앱 종료 안내
+                      },
+                      child: const Text('확인'),
+                    ),
+                  ],
+                ),
+          );
+        },
+        loading: () {
+          print('loading');
+          // 로딩 중에는 아무것도 하지 않음 (UI가 이미 로딩 표시 중)
+        },
+      );
+    });
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
