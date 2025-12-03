@@ -1,4 +1,4 @@
-import 'package:flutter_hyotalk_app/features/auth/auth_notifier.dart';
+import 'package:flutter_hyotalk_app/features/auth/notifier/auth_notifier.dart';
 import 'package:flutter_hyotalk_app/features/auth/models/auth_state.dart';
 import 'package:flutter_hyotalk_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
