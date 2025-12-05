@@ -12,14 +12,12 @@
 .svn/
 
 # ===============================
-# 🧱 IDE 관련 (IntelliJ / Android Studio / VSCode)
+# 🧱 IDE 관련 (IntelliJ / Android Studio)
 # ===============================
 *.iml
 *.ipr
 *.iws
 .idea/
-.vscode/*
-!.vscode/settings.json
 
 # ===============================
 # 🐦 Flutter / Dart / Pub 관련
