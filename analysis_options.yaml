@@ -1,5 +1,8 @@
 include: package:flutter_lints/flutter.yaml
 
+formatter:
+  lineLength: 100
+
 linter:
   rules:
     # 💅 코드 스타일
@@ -43,6 +46,3 @@ analyzer:
     unused_shown_name: error
     unused_label: error
     unreachable_from_main: error
-  exclude:
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
