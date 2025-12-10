@@ -34,27 +34,5 @@
                 "--dart-define=FLAVOR=prod"
             ]
         },
-        {
-            "name": "flutter_hyotalk_app (dev - profile)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile",
-            "args": [
-                "--flavor",
-                "dev",
-                "--dart-define=FLAVOR=dev"
-            ]
-        },
-        {
-            "name": "flutter_hyotalk_app (dev - release)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release",
-            "args": [
-                "--flavor",
-                "dev",
-                "--dart-define=FLAVOR=dev"
-            ]
-        }
     ]
 }

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_hyotalk_app/features/auth/data/models/auth_model.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -8,33 +7,27 @@ abstract class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-class AuthInitial extends AuthState {
-  const AuthInitial();
-}
+/// 초기 상태
+class AuthInitial extends AuthState {}
 
-class AuthLoading extends AuthState {
-  const AuthLoading();
-}
+/// Auth 로딩 상태
+class AuthLoading extends AuthState {}
 
+/// Auth 인증 완료 상태
 class AuthAuthenticated extends AuthState {
-  final AuthModel authModel;
+  final String token;
 
-  const AuthAuthenticated(this.authModel);
+  const AuthAuthenticated({required this.token});
 
   @override
-  List<Object?> get props => [authModel];
+  List<Object?> get props => [token];
 }
 
-class AuthUnauthenticated extends AuthState {
-  const AuthUnauthenticated();
-}
+/// Auth 인증 안된 상태
+class AuthUnauthenticated extends AuthState {}
 
-class AuthError extends AuthState {
+/// Auth 인증 실패 상태
+class AuthFailure extends AuthState {
   final String message;
-
-  const AuthError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  const AuthFailure(this.message);
 }
-

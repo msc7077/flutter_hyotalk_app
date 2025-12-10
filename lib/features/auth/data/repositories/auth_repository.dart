@@ -1,98 +1,85 @@
-import 'package:flutter_hyotalk_app/core/config/env_config.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_hyotalk_app/core/network/api_endpoints.dart';
-import 'package:flutter_hyotalk_app/core/network/dio_client.dart';
-import 'package:flutter_hyotalk_app/core/storage/preference_storage.dart';
-import 'package:flutter_hyotalk_app/core/storage/secure_storage.dart';
-import 'package:flutter_hyotalk_app/features/auth/data/models/auth_model.dart';
+import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
+import 'package:flutter_hyotalk_app/core/storage/app_secure_storage.dart';
 
 class AuthRepository {
-  final DioClient _dioClient;
+  final Dio authDio;
+  final AppPreferenceStorage prefs;
+  final AppSecureStorage secureStorage;
 
-  AuthRepository(this._dioClient);
+  AuthRepository({
+    required this.authDio,
+    required this.prefs,
+    required this.secureStorage,
+  });
 
-  // 서버에서 토큰 가져오기
-  Future<String> getTokenFromServer() async {
-    // 테스트 모드인 경우 Mock 토큰 반환
-    if (EnvConfig.isTestMode) {
-      await Future.delayed(const Duration(milliseconds: 500)); // 네트워크 지연 시뮬레이션
-      return 'test_token_${DateTime.now().millisecondsSinceEpoch}';
+  Future<String> requestLogin(String id, String password) async {
+    final res = await authDio.post(
+      ApiEndpoints.authLogin,
+      data: {
+        'userid': id,
+        'password': password,
+        'grant_type': 'password',
+        'scope': '*',
+        'service': 'silveredu',
+        'site': 'Hyotalk',
+      },
+    );
+
+    if (res.statusCode != 200) {
+      return _throwAuthFailure(res, '로그인에 실패했습니다.');
     }
 
-    try {
-      final response = await _dioClient.get(ApiEndpoints.getToken);
-      return response.data['token'] as String;
-    } catch (e) {
-      throw Exception('토큰 가져오기 실패: $e');
+    final data = res.data;
+    if (data is! Map<String, dynamic>) {
+      return _throwAuthFailure(res, '알 수 없는 응답 형식입니다.');
     }
+
+    final token = data['token'] as String?;
+    if (token == null || token.isEmpty) {
+      final messageCode = data['message'] as String?;
+      final message = _mapAuthErrorMessage(messageCode);
+      return _throwAuthFailure(res, message);
+    }
+
+    await secureStorage.setString(AppSecureStorageKey.token, token);
+    return token;
   }
 
-  // 토큰으로 로그인
-  Future<AuthModel> loginWithToken(String token) async {
-    // 테스트 모드인 경우 Mock 데이터 반환
-    if (EnvConfig.isTestMode) {
-      await Future.delayed(const Duration(milliseconds: 500)); // 네트워크 지연 시뮬레이션
-
-      final authModel = AuthModel(token: token, refreshToken: 'refresh_$token');
-
-      // 토큰 저장
-      await SecureStorage.saveToken(authModel.token);
-
-      return authModel;
-    }
-
-    try {
-      final response = await _dioClient.post(ApiEndpoints.login, data: {'token': token});
-
-      final authData = response.data;
-      final authModel = AuthModel(
-        token: authData['token'] as String,
-        refreshToken: authData['refreshToken'] as String?,
-      );
-
-      // 토큰 저장
-      await SecureStorage.saveToken(authModel.token);
-
-      return authModel;
-    } catch (e) {
-      throw Exception('로그인 실패: $e');
-    }
+  Future<void> requestLogout() async {
+    await secureStorage.remove(AppSecureStorageKey.token);
+    await prefs.remove(AppPreferenceStorageKey.isAutoLogin);
   }
 
-  // 자동 로그인 설정
-  Future<void> setAutoLogin(bool value) async {
-    await PreferenceStorage.setAutoLogin(value);
+  /// Auth 실패 예외 처리
+  ///
+  /// response 값과 message 값을 받아서 예외 처리
+  Never _throwAuthFailure(Response res, String message) {
+    res.requestOptions.extra['customErrorMessage'] = message;
+    throw DioException(
+      requestOptions: res.requestOptions,
+      response: res,
+      message: message,
+      type: DioExceptionType.badResponse,
+    );
   }
 
-  // 자동 로그인 확인
-  Future<bool> checkAutoLogin() async {
-    return await PreferenceStorage.getAutoLogin();
-  }
-
-  // 저장된 토큰으로 자동 로그인
-  Future<AuthModel?> autoLogin() async {
-    final token = await SecureStorage.getToken();
-    if (token != null) {
-      return AuthModel(token: token);
-    }
-    return null;
-  }
-
-  // 로그아웃
-  Future<void> logout() async {
-    // 테스트 모드인 경우 바로 로컬 데이터만 삭제
-    if (EnvConfig.isTestMode) {
-      await SecureStorage.clearAll();
-      await PreferenceStorage.clearAutoLogin();
-      return;
-    }
-
-    try {
-      await _dioClient.post(ApiEndpoints.logout);
-    } catch (e) {
-      // 에러가 나도 로컬 데이터는 삭제
-    } finally {
-      await SecureStorage.clearAll();
-      await PreferenceStorage.clearAutoLogin();
+  /// Auth 에러 메시지 매핑
+  String _mapAuthErrorMessage(String? code) {
+    switch (code?.toLowerCase()) {
+      case 'befound':
+        return '비밀번호가 올바르지 않습니다.';
+      case 'none':
+        return '해당 아이디를 찾을 수 없습니다.';
+      case 'user expired':
+        return '계정이 만료되었습니다. 탈퇴 후 30일 이내라면 복구가 가능합니다.';
+      case 'user restore':
+        return '계정이 영구 만료되었습니다. 탈퇴 후 30일이 지나 복구가 불가합니다.';
+      case 'user hold':
+        return '계정이 정지되었습니다. 관리자에게 문의해주세요.';
+      default:
+        return '토큰을 발급받지 못했습니다. 다시 시도해주세요.';
     }
   }
 }

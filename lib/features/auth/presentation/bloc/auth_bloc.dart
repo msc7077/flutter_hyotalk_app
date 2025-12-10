@@ -1,102 +1,79 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
+import 'package:flutter_hyotalk_app/core/storage/app_secure_storage.dart';
 import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
-  bool _autoLoginFlag = false;
 
-  AuthBloc(this._authRepository) : super(const AuthInitial()) {
-    on<AuthInit>(_onAuthInit);
-    on<AuthGetToken>(_onAuthGetToken);
-    on<AuthLogin>(_onAuthLogin);
-    on<AuthAutoLogin>(_onAuthAutoLogin);
-    on<AuthLogout>(_onAuthLogout);
+  AuthBloc(this._authRepository) : super(AuthInitial()) {
+    on<AutoLoginCheckRequested>(_onAutoLoginCheckRequested);
+    on<LoginRequested>(_onLoginRequested);
+    on<LogoutRequested>(_onLogoutRequested);
   }
 
-  void setAutoLoginFlag(bool value) {
-    _autoLoginFlag = value;
-  }
-
-  Future<void> _onAuthInit(AuthInit event, Emitter<AuthState> emit) async {
-    emit(const AuthLoading());
-    
-    final autoLoginEnabled = await _authRepository.checkAutoLogin();
-    if (autoLoginEnabled) {
-      add(const AuthAutoLogin());
+  /// 자동로그인 체크
+  Future<void> _onAutoLoginCheckRequested(
+    AutoLoginCheckRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    final token = await AppSecureStorage.instance.getString(
+      AppSecureStorageKey.token,
+    );
+    final isAutoLogin = AppPreferenceStorage.instance.getBool(
+      AppPreferenceStorageKey.isAutoLogin,
+    );
+    if (isAutoLogin && token != null && token.isNotEmpty) {
+      // 인증된 상태
+      emit(AuthAuthenticated(token: token));
     } else {
-      emit(const AuthUnauthenticated());
+      // 인증되지 않은 상태
+      emit(AuthUnauthenticated());
     }
   }
 
-  Future<void> _onAuthGetToken(
-    AuthGetToken event,
+  /// 로그인
+  ///
+  /// @param id 아이디
+  /// @param password 비밀번호
+  /// @param isAutoLogin 자동로그인 여부
+  ///
+  /// Auth 토큰 요청 - 정상 토큰 발급시 정상 로그인
+  Future<void> _onLoginRequested(
+    LoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(const AuthLoading());
+    emit(AuthLoading());
     try {
-      final token = await _authRepository.getTokenFromServer();
-      // 토큰을 받은 후 자동으로 로그인
-      final authModel = await _authRepository.loginWithToken(token);
-      
-      // 자동 로그인 플래그가 설정되어 있으면 저장
-      if (_autoLoginFlag) {
-        await _authRepository.setAutoLogin(true);
-      }
-      
-      emit(AuthAuthenticated(authModel));
+      final token = await _authRepository.requestLogin(
+        event.id,
+        event.password,
+      );
+      await AppPreferenceStorage.instance.setBool(
+        AppPreferenceStorageKey.isAutoLogin,
+        event.isAutoLogin,
+      );
+      emit(AuthAuthenticated(token: token));
+    } on DioException catch (e) {
+      final errorMessage =
+          e.requestOptions.extra['customErrorMessage'] as String? ??
+          '로그인에 실패했습니다.';
+      emit(AuthFailure(errorMessage));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthFailure('알 수 없는 오류가 발생했습니다: ${e.toString()}'));
     }
   }
 
-  Future<void> _onAuthLogin(
-    AuthLogin event,
+  /// 로그아웃 요청
+  Future<void> _onLogoutRequested(
+    LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(const AuthLoading());
-    try {
-      final authModel = await _authRepository.loginWithToken(event.token);
-      
-      if (event.autoLogin) {
-        await _authRepository.setAutoLogin(true);
-      }
-      
-      emit(AuthAuthenticated(authModel));
-    } catch (e) {
-      emit(AuthError(e.toString()));
-    }
-  }
-
-  Future<void> _onAuthAutoLogin(
-    AuthAutoLogin event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(const AuthLoading());
-    try {
-      final authModel = await _authRepository.autoLogin();
-      if (authModel != null) {
-        emit(AuthAuthenticated(authModel));
-      } else {
-        emit(const AuthUnauthenticated());
-      }
-    } catch (e) {
-      emit(AuthError(e.toString()));
-    }
-  }
-
-  Future<void> _onAuthLogout(
-    AuthLogout event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(const AuthLoading());
-    try {
-      await _authRepository.logout();
-      emit(const AuthUnauthenticated());
-    } catch (e) {
-      emit(AuthError(e.toString()));
-    }
+    await _authRepository.requestLogout();
+    emit(AuthUnauthenticated());
   }
 }
-

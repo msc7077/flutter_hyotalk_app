@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
+import 'package:go_router/go_router.dart';
 
 class MypageTabPage extends StatelessWidget {
   const MypageTabPage({super.key});
@@ -10,9 +10,7 @@ class MypageTabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('마이페이지'),
-      ),
+      appBar: AppBar(title: const Text('마이페이지')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -92,7 +90,7 @@ class MypageTabPage extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                context.read<AuthBloc>().add(const AuthLogout());
+                context.read<AuthBloc>().add(LogoutRequested());
                 context.go('/login');
               },
               style: ElevatedButton.styleFrom(
@@ -120,14 +118,10 @@ class MypageTabPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             name,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
 }
-

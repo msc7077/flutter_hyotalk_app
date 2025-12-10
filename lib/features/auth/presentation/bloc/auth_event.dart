@@ -7,32 +7,24 @@ abstract class AuthEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AuthInit extends AuthEvent {
-  const AuthInit();
-}
+/// 자동로그인 체크
+class AutoLoginCheckRequested extends AuthEvent {}
 
-class AuthGetToken extends AuthEvent {
-  const AuthGetToken();
-}
+/// Auth Token 요청
+class LoginRequested extends AuthEvent {
+  final String id;
+  final String password;
+  final bool isAutoLogin;
 
-class AuthLogin extends AuthEvent {
-  final String token;
-  final bool autoLogin;
-
-  const AuthLogin({
-    required this.token,
-    this.autoLogin = false,
+  const LoginRequested({
+    required this.id,
+    required this.password,
+    this.isAutoLogin = false,
   });
 
   @override
-  List<Object?> get props => [token, autoLogin];
+  List<Object?> get props => [id, password, isAutoLogin];
 }
 
-class AuthAutoLogin extends AuthEvent {
-  const AuthAutoLogin();
-}
-
-class AuthLogout extends AuthEvent {
-  const AuthLogout();
-}
-
+/// 로그아웃 요청 이벤트
+class LogoutRequested extends AuthEvent {}
