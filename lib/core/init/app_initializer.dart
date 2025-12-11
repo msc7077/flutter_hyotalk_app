@@ -19,14 +19,11 @@ class AppInitializer {
 
   late final Dio authDio;
   late final Dio homeDio;
-  final AppPreferenceStorage appPreferenceStorage =
-      AppPreferenceStorage.instance;
-  final AppSecureStorage appSecureStorage = AppSecureStorage.instance;
 
   Future<void> init() async {
     authDio = DioClient.createAuthClient();
     homeDio = DioClient.createHyotalkClient();
-    await appPreferenceStorage.init();
-    await appSecureStorage.init();
+    await AppSecureStorage.init();
+    await AppPreferenceStorage.init();
   }
 }

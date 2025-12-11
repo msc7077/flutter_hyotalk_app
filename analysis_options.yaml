@@ -1,28 +1,48 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
-
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
-linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
-  rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+formatter:
+  lineLength: 100
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+linter:
+  rules:
+    # 💅 코드 스타일
+    prefer_single_quotes: true
+    always_use_package_imports: true
+    avoid_print: false
+    prefer_final_locals: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    unnecessary_this: true
+
+    # ⚙️ 안정성과 가독성
+    use_key_in_widget_constructors: true
+    avoid_returning_null_for_future: true
+    cancel_subscriptions: true
+    close_sinks: true
+    avoid_init_to_null: true
+
+    # 🧩 네이밍 및 구조
+    library_private_types_in_public_api: false
+    avoid_classes_with_only_static_members: false
+    constant_identifier_names: false
+    file_names: true
+
+    # 🕵️ 사용되지 않는 코드 감지 (Public 멤버 포함)
+    unreachable_from_main: true
+
+analyzer:
+  errors:
+    # 필요 시 경고/에러 레벨 조정
+    avoid_print: info
+    missing_return: error
+    dead_code: error
+    # 사용하지 않는 변수나 함수 감지 (단, Public 멤버는 제외된다. _를 붙여 Private 멤버로 처리를 습관화하길)
+    unused_local_variable: error
+    unused_element: error
+    unused_field: error
+    unused_import: error
+    unused_catch_clause: error
+    unused_catch_stack: error
+    unused_shown_name: error
+    unused_label: error
+    unreachable_from_main: error

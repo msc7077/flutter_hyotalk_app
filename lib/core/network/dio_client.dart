@@ -46,9 +46,7 @@ class DioClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await AppSecureStorage.instance.getString(
-            AppSecureStorageKey.token,
-          );
+          final token = await AppSecureStorage.getString(AppSecureStorageKey.token);
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }

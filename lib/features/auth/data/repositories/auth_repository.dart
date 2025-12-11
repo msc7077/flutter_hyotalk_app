@@ -3,16 +3,13 @@ import 'package:flutter_hyotalk_app/core/network/api_endpoints.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_secure_storage.dart';
 
+/// Auth 관련 네트워크 요청 처리
+///
+/// authDio를 주입 받아 네트워크 요청 처리
 class AuthRepository {
   final Dio authDio;
-  final AppPreferenceStorage prefs;
-  final AppSecureStorage secureStorage;
 
-  AuthRepository({
-    required this.authDio,
-    required this.prefs,
-    required this.secureStorage,
-  });
+  AuthRepository({required this.authDio});
 
   Future<String> requestLogin(String id, String password) async {
     final res = await authDio.post(
@@ -43,13 +40,13 @@ class AuthRepository {
       return _throwAuthFailure(res, message);
     }
 
-    await secureStorage.setString(AppSecureStorageKey.token, token);
+    await AppSecureStorage.setString(AppSecureStorageKey.token, token);
     return token;
   }
 
   Future<void> requestLogout() async {
-    await secureStorage.remove(AppSecureStorageKey.token);
-    await prefs.remove(AppPreferenceStorageKey.isAutoLogin);
+    await AppSecureStorage.remove(AppSecureStorageKey.token);
+    await AppPreferenceStorage.remove(AppPreferenceStorageKey.isAutoLogin);
   }
 
   /// Auth 실패 예외 처리
@@ -65,7 +62,7 @@ class AuthRepository {
     );
   }
 
-  /// Auth 에러 메시지 매핑
+  /// Auth 에러 메시지
   String _mapAuthErrorMessage(String? code) {
     switch (code?.toLowerCase()) {
       case 'befound':

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,21 +34,9 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           // 로그인 성공 시 홈으로 이동
-          context.go('/home');
+          context.go(AppRouterPath.home);
         } else if (state is AuthFailure) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('로그인 실패'),
-              content: Text(state.message),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('확인'),
-                ),
-              ],
-            ),
-          );
+          AppErrorDialog.show(context, state.message, title: '로그인 실패');
         }
       },
       child: Scaffold(
@@ -67,10 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                     margin: EdgeInsets.only(top: 60.h, bottom: 25.h),
                     child: Text(
                       '로그인',
-                      style: TextStyle(
-                        fontSize: 32.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Form(
@@ -81,9 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                           controller: _idTextEditingController,
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.r),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.r),
                               borderSide: const BorderSide(color: Colors.amber),
@@ -106,9 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                           keyboardType: TextInputType.visiblePassword,
                           autocorrect: false,
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.r),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.r),
                               borderSide: const BorderSide(color: Colors.amber),
@@ -132,14 +115,8 @@ class _LoginPageState extends State<LoginPage> {
                                 Checkbox(
                                   side: WidgetStateBorderSide.resolveWith(
                                     (states) => _isAutoLogin == true
-                                        ? const BorderSide(
-                                            width: 0.0,
-                                            color: Colors.transparent,
-                                          )
-                                        : BorderSide(
-                                            width: 1.5.w,
-                                            color: Colors.black26,
-                                          ),
+                                        ? const BorderSide(width: 0.0, color: Colors.transparent)
+                                        : BorderSide(width: 1.5.w, color: Colors.black26),
                                   ),
                                   activeColor: _isAutoLogin == true
                                       ? Colors.amber
@@ -153,10 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 Text(
                                   '자동로그인',
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    color: const Color(0XFF4A4A4A),
-                                  ),
+                                  style: TextStyle(fontSize: 13.sp, color: const Color(0XFF4A4A4A)),
                                 ),
                               ],
                             ),
@@ -185,9 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                                           context.read<AuthBloc>().add(
                                             LoginRequested(
                                               id: _idTextEditingController.text,
-                                              password:
-                                                  _passwordTextEditingController
-                                                      .text,
+                                              password: _passwordTextEditingController.text,
                                               isAutoLogin: _isAutoLogin,
                                             ),
                                           );
@@ -199,10 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                                         height: 20.h,
                                         child: const CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                         ),
                                       )
                                     : Text(
@@ -259,19 +228,13 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             '아이디 찾기',
-                            style: TextStyle(
-                              color: const Color(0XFF888888),
-                              fontSize: 13.sp,
-                            ),
+                            style: TextStyle(color: const Color(0XFF888888), fontSize: 13.sp),
                           ),
                         ),
                       ),
                       Text(
                         '┃',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: const Color(0XFFA2A2A2),
-                        ),
+                        style: TextStyle(fontSize: 12.sp, color: const Color(0XFFA2A2A2)),
                       ),
                       Flexible(
                         child: TextButton(
@@ -281,10 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             '비밀번호 재설정',
-                            style: TextStyle(
-                              color: const Color(0XFF888888),
-                              fontSize: 13.sp,
-                            ),
+                            style: TextStyle(color: const Color(0XFF888888), fontSize: 13.sp),
                           ),
                         ),
                       ),

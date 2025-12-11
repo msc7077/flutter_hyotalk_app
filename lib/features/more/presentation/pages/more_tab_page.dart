@@ -4,50 +4,20 @@ import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.da
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:go_router/go_router.dart';
 
-class MypageTabPage extends StatelessWidget {
-  const MypageTabPage({super.key});
+class MoreTabPage extends StatelessWidget {
+  const MoreTabPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('마이페이지')),
+      appBar: AppBar(title: const Text('더보기')),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 이미지 배너
-            _buildBannerSection(),
-            const SizedBox(height: 20),
             // 그리드뷰 카테고리
             _buildCategoryGrid(context),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBannerSection() {
-    return SizedBox(
-      height: 200,
-      child: PageView.builder(
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                '마이페이지 배너 ${index + 1}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -107,19 +77,13 @@ class MypageTabPage extends StatelessWidget {
 
   Widget _buildCategoryCard(String id, String name, IconData icon) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 48, color: Colors.purple),
           const SizedBox(height: 8),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
+          Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
     );

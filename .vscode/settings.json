@@ -1,3 +1,33 @@
 {
-  "dart.flutterSdkPath": ".fvm/versions/3.35.6"
+  "dart.flutterSdkPath": ".fvm/flutter_sdk",
+  "dart.flutterSdkPaths": [
+    ".fvm/flutter_sdk"
+  ],
+  "dart.lineLength": 100,
+  "dart.previewFlutterUiGuides": true,
+  "dart.previewFlutterUiGuidesCustomTracking": true,
+  "dart.flutterHotReloadOnSave": "all",
+  "dart.hotReloadOnSave": "always",
+  "dart.hotRestartOnSave": "never",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "quickfix.insertSemicolon": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "files.autoSaveWhenNoErrors": true,
+  "editor.rulers": [100],
+  "editor.fontFamily": "MesloLGS NF, Menlo, Monaco, 'Courier New', monospace",
+  "editor.minimap.enabled": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.stickyScroll.enabled": true,
+  "editor.renderWhitespace": "all",
+
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true,
+    "editor.rulers": [100],
+    "editor.selectionHighlight": false,
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  },
 }

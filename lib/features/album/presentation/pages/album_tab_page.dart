@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// 업무일지 탭 페이지
-class WorkDiaryTabPage extends StatelessWidget {
-  const WorkDiaryTabPage({super.key});
+class AlbumTabPage extends StatelessWidget {
+  const AlbumTabPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('업무일지')),
+      appBar: AppBar(title: const Text('앨범')),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 이미지 배너
-            _buildBannerSection(),
-            const SizedBox(height: 20),
             // 그리드뷰 카테고리
             _buildCategoryGrid(),
           ],
@@ -22,38 +18,14 @@ class WorkDiaryTabPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBannerSection() {
-    return SizedBox(
-      height: 200,
-      child: PageView.builder(
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                '업무일지 배너 ${index + 1}',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildCategoryGrid() {
     final categories = [
-      {'id': '1', 'name': '업무 카테고리 1', 'icon': Icons.work},
-      {'id': '2', 'name': '업무 카테고리 2', 'icon': Icons.work},
-      {'id': '3', 'name': '업무 카테고리 3', 'icon': Icons.work},
-      {'id': '4', 'name': '업무 카테고리 4', 'icon': Icons.work},
-      {'id': '5', 'name': '업무 카테고리 5', 'icon': Icons.work},
-      {'id': '6', 'name': '업무 카테고리 6', 'icon': Icons.work},
+      {'id': 'shop1', 'name': '앨범 카테고리 1', 'icon': Icons.alarm},
+      {'id': 'shop2', 'name': '앨범 카테고리 2', 'icon': Icons.alarm},
+      {'id': 'shop3', 'name': '앨범 카테고리 3', 'icon': Icons.alarm},
+      {'id': 'shop4', 'name': '앨범 카테고리 4', 'icon': Icons.alarm},
+      {'id': 'shop5', 'name': '앨범 카테고리 5', 'icon': Icons.alarm},
+      {'id': 'shop6', 'name': '앨범 카테고리 6', 'icon': Icons.alarm},
     ];
 
     return Padding(
@@ -86,7 +58,7 @@ class WorkDiaryTabPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 48, color: Colors.green),
+          Icon(icon, size: 48, color: Colors.orange),
           const SizedBox(height: 8),
           Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         ],

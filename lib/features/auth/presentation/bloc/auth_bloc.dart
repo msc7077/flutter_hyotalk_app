@@ -6,6 +6,9 @@ import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_reposit
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 
+/// Auth 관련 로직 처리
+///
+/// authRepository를 주입 받아 네트워크 요청 처리
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
 
@@ -21,12 +24,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    final token = await AppSecureStorage.instance.getString(
-      AppSecureStorageKey.token,
-    );
-    final isAutoLogin = AppPreferenceStorage.instance.getBool(
-      AppPreferenceStorageKey.isAutoLogin,
-    );
+    final token = await AppSecureStorage.getString(AppSecureStorageKey.token);
+    final isAutoLogin = AppPreferenceStorage.getBool(AppPreferenceStorageKey.isAutoLogin);
     if (isAutoLogin && token != null && token.isNotEmpty) {
       // 인증된 상태
       emit(AuthAuthenticated(token: token));
@@ -43,25 +42,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   /// @param isAutoLogin 자동로그인 여부
   ///
   /// Auth 토큰 요청 - 정상 토큰 발급시 정상 로그인
-  Future<void> _onLoginRequested(
-    LoginRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final token = await _authRepository.requestLogin(
-        event.id,
-        event.password,
-      );
-      await AppPreferenceStorage.instance.setBool(
-        AppPreferenceStorageKey.isAutoLogin,
-        event.isAutoLogin,
-      );
+      final token = await _authRepository.requestLogin(event.id, event.password);
+      await AppPreferenceStorage.setBool(AppPreferenceStorageKey.isAutoLogin, event.isAutoLogin);
       emit(AuthAuthenticated(token: token));
     } on DioException catch (e) {
       final errorMessage =
-          e.requestOptions.extra['customErrorMessage'] as String? ??
-          '로그인에 실패했습니다.';
+          e.requestOptions.extra['customErrorMessage'] as String? ?? '로그인에 실패했습니다.';
       emit(AuthFailure(errorMessage));
     } catch (e) {
       emit(AuthFailure('알 수 없는 오류가 발생했습니다: ${e.toString()}'));
@@ -69,10 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   /// 로그아웃 요청
-  Future<void> _onLogoutRequested(
-    LogoutRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     await _authRepository.requestLogout();
     emit(AuthUnauthenticated());
   }

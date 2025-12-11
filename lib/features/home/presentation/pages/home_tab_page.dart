@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeTabPage extends StatelessWidget {
@@ -30,9 +31,15 @@ class HomeTabPage extends StatelessWidget {
         itemBuilder: (context, index) {
           return Container(
             margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: Colors.blue.withOpacity(0.3), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Center(
-              child: Text('배너 ${index + 1}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              child: Text(
+                '배너 ${index + 1}',
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
           );
         },
@@ -64,7 +71,11 @@ class HomeTabPage extends StatelessWidget {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          return _buildCategoryCard(category['id'] as String, category['name'] as String, category['icon'] as IconData);
+          return _buildCategoryCard(
+            category['id'] as String,
+            category['name'] as String,
+            category['icon'] as IconData,
+          );
         },
       ),
     );
@@ -74,11 +85,14 @@ class HomeTabPage extends StatelessWidget {
     return Builder(
       builder: (context) => InkWell(
         onTap: () {
-          context.push('/category/$id');
+          context.pushNamed(AppRouterName.noticeListName);
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

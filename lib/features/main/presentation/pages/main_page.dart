@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/home/presentation/pages/home_tab_page.dart';
-import 'package:flutter_hyotalk_app/features/shopping/presentation/pages/shopping_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/work_diary/presentation/pages/work_diary_tab_page.dart';
+import 'package:flutter_hyotalk_app/router/app_router_path.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+/// 메인 페이지
+///
+/// 하단 탭바를 통해 홈, 업무일지, 쇼핑몰 페이지로 이동
+/// 더보기 탭은 마이페이지 페이지로 이동
 class MainPage extends StatefulWidget {
   final Widget child;
 
@@ -14,27 +20,39 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  /// 페이지 전환 제어
   late PageController _pageController;
+
+  /// 현재 선택된 탭 인덱스 초기값은 0으로 설정
   int _currentIndex = 0;
 
+  /// 하단 탭바 아이콘과 라벨 정의
   final List<NavigationDestination> _destinations = [
-    const NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: '홈'),
-    const NavigationDestination(icon: Icon(Icons.work_outline), selectedIcon: Icon(Icons.work), label: '업무일지'),
-    const NavigationDestination(
-      icon: Icon(Icons.shopping_bag_outlined),
-      selectedIcon: Icon(Icons.shopping_bag),
-      label: '쇼핑몰',
+    NavigationDestination(
+      icon: SvgPicture.asset('assets/icons/icon_menu_home_outlined.svg'),
+      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_home.svg'),
+      label: '홈',
     ),
-    const NavigationDestination(
-      icon: Icon(Icons.more_horiz_outlined),
-      selectedIcon: Icon(Icons.more_horiz),
+    NavigationDestination(
+      icon: SvgPicture.asset('assets/icons/icon_menu_album_outlined.svg'),
+      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_album.svg'),
+      label: '앨범',
+    ),
+    NavigationDestination(
+      icon: SvgPicture.asset('assets/icons/icon_menu_work_outlined.svg'),
+      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_work.svg'),
+      label: '일지',
+    ),
+    NavigationDestination(
+      icon: SvgPicture.asset('assets/icons/icon_menu_more_outlined.svg'),
+      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_more.svg'),
       label: '더보기',
     ),
   ];
 
-  final List<Widget> _pages = [const HomeTabPage(), const WorkDiaryTabPage(), const ShoppingTabPage()];
-
-  final List<String> _routes = ['/home', '/work-diary', '/shopping'];
+  /// 탭 페이지들
+  /// 탭으로만 이동될 페이지들
+  final List<Widget> _pages = [const HomeTabPage(), const AlbumTabPage(), const WorkDiaryTabPage()];
 
   @override
   void initState() {
@@ -44,57 +62,41 @@ class _MainPageState extends State<MainPage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 초기 인덱스 설정
-    final currentLocation = GoRouterState.of(context).matchedLocation;
-    final index = _routes.indexOf(currentLocation);
-    if (index >= 0 && index != _currentIndex) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _pageController.jumpToPage(index);
-          setState(() {
-            _currentIndex = index;
-          });
-        }
-      });
-    }
-  }
-
-  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
 
+  /// 하단 탭바 선택 시 페이지 이동
   void _onDestinationSelected(int index) {
     if (index == 3) {
       // "더보기" 탭은 서브페이지로 열기
-      context.push('/mypage');
+      context.push(AppRouterPath.more);
     } else {
-      _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-      context.go(_routes[index]);
+      context.go(AppRouterPath.homeTabRoutes[index]);
     }
   }
 
+  /// PageView 변경 시 인덱스 동기화
   void _onPageChanged(int index) {
     if (_currentIndex != index) {
       setState(() {
         _currentIndex = index;
       });
-      context.go(_routes[index]);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     // 현재 경로에 따라 인덱스 동기화
-    final currentLocation = GoRouterState.of(context).matchedLocation;
-    final index = _routes.indexOf(currentLocation);
+    final currentLocation = GoRouterState.of(context).matchedLocation; //GoRouter의 현재 매칭된 경로를 가져옵니다
+    final index = AppRouterPath.homeTabRoutes.indexOf(currentLocation);
+    // 경로가 탭 라우트 중 하나이고 현재 선택된 탭 인덱스와 다르면 페이지 이동
     if (index != -1 && _currentIndex != index) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && _currentIndex != index) {
           try {
+            // PageController가 위젯 트리에 연결되어 있는지 확인
             if (_pageController.hasClients) {
               _pageController.jumpToPage(index);
               setState(() {
@@ -109,11 +111,18 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-      body: PageView(controller: _pageController, onPageChanged: _onPageChanged, children: _pages),
+      // PageView로 탭 페이지들 세팅
+      body: PageView(
+        controller: _pageController, // 페이지 전환 제어
+        physics: const NeverScrollableScrollPhysics(), // 스와이프 비활성화 (탭바로만 이동)
+        onPageChanged: _onPageChanged, // 페이지 변경 시 인덱스 동기화
+        children: _pages, // 홈, 앨범, 일지 페이지들
+      ),
+      // 하단 네비게이션 바 (홈, 앨범, 일지, 더보기)
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: _onDestinationSelected,
-        destinations: _destinations,
+        selectedIndex: _currentIndex, // 현재 선택된 탭 인덱스
+        onDestinationSelected: _onDestinationSelected, // 탭 선택 시 페이지 이동
+        destinations: _destinations, // 탭 아이콘과 라벨 정의
       ),
     );
   }

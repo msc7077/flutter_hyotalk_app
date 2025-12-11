@@ -1,82 +1,40 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
-import 'package:flutter_hyotalk_app/router/app_router_name.dart';
+import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
-}
+  Widget build(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) {
+        // AuthInitial, AuthLoading이 아닐 때만 listener 실행
+        return current is! AuthInitial && current is! AuthLoading;
+      },
+      listener: (context, state) {
+        // 인증 상태에 따라 자동으로 네비게이션
+        Future.delayed(const Duration(seconds: 2), () {
+          // 위젯이 아직 살아있는지 확인
+          if (!context.mounted) return;
 
-class _SplashPageState extends State<SplashPage> {
-  bool _hasNavigated = false;
-  StreamSubscription<AuthState>? _subscription;
-
-  @override
-  void initState() {
-    super.initState();
-    // 초기 상태를 확인하여 즉시 이동
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _hasNavigated) return;
-
-      final authState = context.read<AuthBloc>().state;
-
-      // 이미 결정된 상태면 즉시 네비게이션
-      if (authState is AuthAuthenticated ||
-          authState is AuthUnauthenticated ||
-          authState is AuthFailure) {
-        _checkAuthAndNavigate();
-      } else {
-        // 상태가 아직 결정되지 않았으면 Stream 구독
-        _subscription = context.read<AuthBloc>().stream.listen((state) {
-          if (!mounted || _hasNavigated) return;
-          if (state is! AuthInitial && state is! AuthLoading) {
-            _checkAuthAndNavigate();
+          if (state is AuthAuthenticated) {
+            context.go(AppRouterPath.home);
+          } else if (state is AuthUnauthenticated || state is AuthFailure) {
+            context.go(AppRouterPath.login);
           }
         });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
-
-  void _checkAuthAndNavigate() {
-    if (_hasNavigated || !mounted) return;
-
-    final authState = context.read<AuthBloc>().state;
-    if (authState is AuthAuthenticated) {
-      _hasNavigated = true;
-      _subscription?.cancel();
-      if (mounted) {
-        context.go(AppRouterName.home);
-      }
-    } else if (authState is AuthUnauthenticated || authState is AuthFailure) {
-      _hasNavigated = true;
-      _subscription?.cancel();
-      if (mounted) {
-        context.go(AppRouterName.login);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Transform.scale(
-          scale: 0.7,
-          child: SvgPicture.asset('assets/images/splash_new.svg'),
+      },
+      child: Scaffold(
+        body: Center(
+          child: Transform.scale(
+            scale: 0.7,
+            child: SvgPicture.asset('assets/images/splash_new.svg'),
+          ),
         ),
       ),
     );
