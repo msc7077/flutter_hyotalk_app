@@ -123,6 +123,8 @@ class _MainPageState extends State<MainPage> {
         selectedIndex: _currentIndex, // 현재 선택된 탭 인덱스
         onDestinationSelected: _onDestinationSelected, // 탭 선택 시 페이지 이동
         destinations: _destinations, // 탭 아이콘과 라벨 정의
+        indicatorColor: Colors.transparent, // 선택된 탭의 배경색 제거
+        backgroundColor: Color(0xFFFFFFFF),
       ),
     );
   }

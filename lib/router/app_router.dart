@@ -6,6 +6,7 @@ import 'package:flutter_hyotalk_app/features/auth/presentation/pages/splash_page
 import 'package:flutter_hyotalk_app/features/main/presentation/pages/main_page.dart';
 import 'package:flutter_hyotalk_app/features/more/presentation/pages/more_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_detail_page.dart';
+import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_form_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_list_page.dart';
 import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
@@ -62,6 +63,23 @@ class AppRouter {
         path: AppRouterPath.noticeList,
         name: AppRouterName.noticeListName,
         pageBuilder: (context, state) => _buildSlidePage(context, state, const NoticeListPage()),
+      ),
+      GoRoute(
+        path: AppRouterPath.noticeForm,
+        name: AppRouterName.noticeFormName,
+        pageBuilder: (context, state) {
+          // 작성 모드
+          return _buildSlidePage(context, state, const NoticeFormPage());
+        },
+      ),
+      GoRoute(
+        path: AppRouterPath.noticeEdit,
+        name: AppRouterName.noticeEditName,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          // 수정 모드
+          return _buildSlidePage(context, state, NoticeFormPage(noticeId: id));
+        },
       ),
       GoRoute(
         path: AppRouterPath.noticeDetail,

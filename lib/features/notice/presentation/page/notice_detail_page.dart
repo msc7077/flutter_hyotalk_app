@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 /// 공지사항 상세 페이지
 ///
@@ -27,8 +29,8 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
   final String _content =
       '공지사항 내용입니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.\n\n여러 줄의 내용을 표시할 수 있습니다.';
   final List<String> _attachedImages = [
-    'https://via.placeholder.com/400x300',
-    'https://via.placeholder.com/400x300',
+    'https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_0d725069-2e6a-4b63-8ddc-895d98986c83/silver_res/hyotalk/agency/12345678912/letter/62b2a83092b74c07720fd5a3/Screenshot_20220614-131022.jpg',
+    'https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_0d725069-2e6a-4b63-8ddc-895d98986c83/silver_res/hyotalk/agency/12345678912/letter/62b2a8e2debd3a21950e96e7/images.jpeg-12.jpg',
   ];
   final List<Map<String, dynamic>> _comments = [
     {'id': '1', 'authorName': '김철수', 'createdDate': '2024.01.16', 'content': '좋은 공지사항이네요!'},
@@ -383,11 +385,11 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
               leading: const Icon(Icons.edit),
               title: const Text('게시글 수정'),
               onTap: () {
-                Navigator.pop(context);
-                // TODO: 게시글 수정 페이지로 이동
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('게시글 수정 기능')));
+                context.pop();
+                context.pushNamed(
+                  AppRouterName.noticeEditName,
+                  pathParameters: {'id': widget.noticeId},
+                );
               },
             ),
             // 게시글 삭제
@@ -395,7 +397,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
               leading: const Icon(Icons.delete, color: Colors.red),
               title: const Text('게시글 삭제', style: TextStyle(color: Colors.red)),
               onTap: () {
-                Navigator.pop(context);
+                context.pop();
                 _showDeleteConfirmDialog(context);
               },
             ),

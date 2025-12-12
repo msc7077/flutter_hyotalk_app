@@ -5,24 +5,47 @@
 /// 예) context.goNamed(AppRouterName.noticeDetailName, pathParameters: {'id': '123'});
 class AppRouterPath {
   AppRouterPath._();
-  // 경로
-  static const String splash = '/splash';
-  static const String login = '/login';
-  static const String home = '/home';
-  static const String album = '/album';
-  static const String workDiary = '/work-diary';
-  static const String more = '/more';
-  static const String noticeList = '/notice-list';
-  static const String noticeDetail = '/notice/:id';
-  static const String note = '/note';
-  static const String noteDetail = '/note/:id';
-  static const String seniorInfo = '/senior-info';
-  static const String seniorAttendance = '/senior-attendance';
-  static const String staffAttendance = '/staff-attendance';
-  static const String lifeEducation = '/life-education';
-  static const String lifeEducationDetail = '/life-education/:id';
-  static const String todayVideo = '/today-video';
-  static const String approveAndInvite = '/approve-and-invite';
 
+  // 스플레시 페이지
+  static const String splash = '/splash';
+  // 로그인 페이지
+  static const String login = '/login';
+  // 메인 - 홈 페이지
+  static const String home = '/home';
+  // 메인 - 앨범 페이지
+  static const String album = '/album';
+  // 메인 - 일지 페이지
+  static const String workDiary = '/work-diary';
+  // 메인 - 더보기 페이지
+  static const String more = '/more';
+  // 공지사항 - 리스트 페이지
+  static const String noticeList = '/notice-list';
+  // 공지사항 - 상세 페이지
+  static const String noticeDetail = '/notice/:id';
+  // 공지사항 - 작성 페이지
+  static const String noticeForm = '/notice/form';
+  // 공지사항 - 수정 페이지
+  static const String noticeEdit = '/notice/form/:id';
+  // 알림장 - 리스트 페이지
+  static const String note = '/note';
+  // 알림장 - 상세 페이지
+  static const String noteDetail = '/note/:id';
+  // 어르신 정보 - 리스트 페이지
+  static const String seniorInfo = '/senior-info';
+  // 어르신 정보 - 상세 페이지
+  static const String seniorInfoDetail = '/senior-info/:id';
+  // 어르신 출석 - 리스트 페이지
+  static const String seniorAttendance = '/senior-attendance';
+  // 직원 출석 - 리스트 페이지
+  static const String staffAttendance = '/staff-attendance';
+  // 생활교육 - 리스트 페이지
+  static const String lifeEducation = '/life-education';
+  // 생활교육 - 상세 페이지
+  static const String lifeEducationDetail = '/life-education/:id';
+  // 오늘의 영상 - 리스트 페이지
+  static const String todayVideo = '/today-video';
+  // 승인 및 초대 - 리스트 페이지
+  static const String approveAndInvite = '/approve-and-invite';
+  // 홈 - 탭 라우트
   static const List<String> homeTabRoutes = [home, album, workDiary, more];
 }
