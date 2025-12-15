@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_hyotalk_app/features/auth/data/models/user_info_model.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -16,11 +17,12 @@ class AuthLoading extends AuthState {}
 /// Auth 인증 완료 상태
 class AuthAuthenticated extends AuthState {
   final String token;
+  final UserInfoModel userInfo;
 
-  const AuthAuthenticated({required this.token});
+  const AuthAuthenticated({required this.token, required this.userInfo});
 
   @override
-  List<Object?> get props => [token];
+  List<Object?> get props => [token, userInfo];
 }
 
 /// Auth 인증 안된 상태

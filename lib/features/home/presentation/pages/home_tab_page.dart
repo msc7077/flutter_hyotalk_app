@@ -4,7 +4,8 @@ import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
 import 'package:flutter_hyotalk_app/core/widget/loading/app_loading_indicator.dart';
-import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_hyotalk_app/features/home/data/models/menu_category_model.dart';
 import 'package:flutter_hyotalk_app/features/home/data/repositories/home_repository.dart';
 import 'package:flutter_hyotalk_app/features/home/presentation/bloc/home_bloc.dart';
@@ -41,17 +42,16 @@ class _HomeTabPageState extends State<HomeTabPage> {
   ///
   /// AuthBloc에서 UserInfo를 가져와서 기관 아이디로 기관 정보를 로드합니다.
   Future<void> _loadAgencyInfo() async {
-    try {
-      // AuthRepository 주입
-      final authRepository = context.read<AuthRepository>();
-      // AuthRepository에서 UserInfo를 가져와서 기관 아이디로 기관 정보를 로드합니다.
-      final userInfo = await authRepository.getUserInfo();
+    // AuthBloc의 State에서 사용자 정보 가져오기
+    final authState = context.read<AuthBloc>().state;
 
-      // 기관 아이디로 기관 정보 로드
+    if (authState is AuthAuthenticated) {
+      // State에 이미 사용자 정보가 있음
+      final userInfo = authState.userInfo;
       _homeBloc.add(AgencyInfoLoadRequested(userInfo.agencyId));
-    } catch (e) {
-      // 에러 발생 시 빈 상태로 시작
-      // TODO: 에러 처리 (스낵바 표시 등)
+    } else {
+      // 로그인 안 된 상태 (이론적으로는 발생하지 않아야 함)
+      // TODO: 에러 처리
     }
   }
 
