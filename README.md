@@ -67,34 +67,58 @@ ENV=prod
 
 ### 패키지 설치
 ```bash
-flutter pub get
+fvm flutter pub get
 ```
 
 ### 개발 환경 실행
 ```bash
 # Android
-flutter run --flavor dev -t lib/main.dart
+fvm flutter run --flavor dev -t lib/main.dart
 
 # iOS
-flutter run --flavor dev -t lib/main.dart
+fvm flutter run --flavor dev -t lib/main.dart
 ```
 
 ### 스테이징 환경 빌드
 ```bash
 # Android
-flutter build apk --flavor stage -t lib/main.dart
+fvm flutter build apk --flavor stage -t lib/main.dart
 
 # iOS
-flutter build ios --flavor stage -t lib/main.dart
+fvm flutter build ios --flavor stage -t lib/main.dart
 ```
 
 ### 프로덕션 환경 빌드
 ```bash
 # Android
-flutter build apk --flavor prod -t lib/main.dart
+fvm flutter build apk --flavor prod -t lib/main.dart
 
 # iOS
-flutter build ios --flavor prod -t lib/main.dart
+fvm flutter build ios --flavor prod -t lib/main.dart
+```
+
+### vscode/cursor debug run
+```bash
+
+launch.json 세팅 참고
+
+```
+
+
+## 🚀 Deploy
+
+```bash
+pubspec.yaml 에서 버전을 수정한다.
+version: (version name)+(version code)
+내부 테스트 시 version code만 +1 로 테스트 진행한다.
+
+# Android
+fvm flutter build appbundle --release --dart-define=FLAVOR=prod
+
+# iOS
+fvm flutter build ios --release --dart-define=FLAVOR=prod
+(해당 명령어를 실행해야 pubspec에서 지정한 버전이 Xcode에 적용되어 Archive 실행시 지정한 버전이 적용됨 )
+Xcode : Archives를 통해 배포
 ```
 
 ## 화면 구조
