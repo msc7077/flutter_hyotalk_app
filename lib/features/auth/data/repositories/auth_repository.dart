@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_hyotalk_app/core/network/api_endpoints.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_secure_storage.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
+import 'package:flutter_hyotalk_app/features/auth/data/models/user_info_model.dart';
 
 /// Auth 관련 네트워크 요청 처리
 ///
@@ -11,6 +13,13 @@ class AuthRepository {
 
   AuthRepository({required this.authDio});
 
+  /// 로그인
+  ///
+  /// @param id 아이디
+  /// @param password 비밀번호
+  /// @return String 토큰
+  ///
+  /// Auth 토큰 요청 - 정상 토큰 발급시 정상 로그인
   Future<String> requestLogin(String id, String password) async {
     final res = await authDio.post(
       ApiEndpoints.authLogin,
@@ -25,12 +34,12 @@ class AuthRepository {
     );
 
     if (res.statusCode != 200) {
-      return _throwAuthFailure(res, '로그인에 실패했습니다.');
+      return _throwAuthFailure(res, AppTexts.loginFailed);
     }
 
     final data = res.data;
     if (data is! Map<String, dynamic>) {
-      return _throwAuthFailure(res, '알 수 없는 응답 형식입니다.');
+      return _throwAuthFailure(res, AppTexts.unknownError);
     }
 
     final token = data['token'] as String?;
@@ -44,6 +53,46 @@ class AuthRepository {
     return token;
   }
 
+  /// 사용자 정보 조회
+  ///
+  /// @return UserInfoModel 사용자 정보 (기관아이디, 권한 포함)
+  Future<UserInfoModel> getUserInfo() async {
+    // TODO: 실제 API 호출
+    // final res = await authDio.get(ApiEndpoints.userInfo);
+    //
+    // if (res.statusCode != 200) {
+    //   throw DioException(
+    //     requestOptions: res.requestOptions,
+    //     response: res,
+    //     message: '사용자 정보를 불러오는데 실패했습니다.',
+    //     type: DioExceptionType.badResponse,
+    //   );
+    // }
+    //
+    // final data = res.data;
+    // if (data is! Map<String, dynamic>) {
+    //   throw DioException(
+    //     requestOptions: res.requestOptions,
+    //     response: res,
+    //     message: '알 수 없는 응답 형식입니다.',
+    //     type: DioExceptionType.badResponse,
+    //   );
+    // }
+    //
+    // return UserInfoModel.fromJson(data);
+
+    // 임시 데이터 (실제 API 응답 형식)
+    await Future.delayed(const Duration(milliseconds: 300));
+    return UserInfoModel.fromJson({
+      'user_id': 'user123',
+      'agency_id': 'agency123',
+      'permissions': ['read', 'write', 'admin'],
+    });
+  }
+
+  /// 로그아웃
+  ///
+  /// 토큰 제거 및 자동 로그인 정보 제거
   Future<void> requestLogout() async {
     await AppSecureStorage.remove(AppSecureStorageKey.token);
     await AppPreferenceStorage.remove(AppPreferenceStorageKey.isAutoLogin);
@@ -66,17 +115,17 @@ class AuthRepository {
   String _mapAuthErrorMessage(String? code) {
     switch (code?.toLowerCase()) {
       case 'befound':
-        return '비밀번호가 올바르지 않습니다.';
+        return AppTexts.loginFailedBefound;
       case 'none':
-        return '해당 아이디를 찾을 수 없습니다.';
+        return AppTexts.loginFailedNone;
       case 'user expired':
-        return '계정이 만료되었습니다. 탈퇴 후 30일 이내라면 복구가 가능합니다.';
+        return AppTexts.loginFailedUserExpired;
       case 'user restore':
-        return '계정이 영구 만료되었습니다. 탈퇴 후 30일이 지나 복구가 불가합니다.';
+        return AppTexts.loginFailedUserRestore;
       case 'user hold':
-        return '계정이 정지되었습니다. 관리자에게 문의해주세요.';
+        return AppTexts.loginFailedUserHold;
       default:
-        return '토큰을 발급받지 못했습니다. 다시 시도해주세요.';
+        return AppTexts.loginFailedTokenIssue;
     }
   }
 }

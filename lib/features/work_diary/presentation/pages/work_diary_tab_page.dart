@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 
 /// 업무일지 탭 페이지
 class WorkDiaryTabPage extends StatelessWidget {
@@ -8,6 +9,7 @@ class WorkDiaryTabPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('업무일지')),
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         child: Column(
           children: [

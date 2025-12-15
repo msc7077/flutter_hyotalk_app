@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_assets.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+/// 스플레시 페이지
+///
+/// 앱 시작 시 표시되는 페이지
+/// 2초 후 인증 상태에 따라 자동으로 네비게이션
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
@@ -31,10 +36,7 @@ class SplashPage extends StatelessWidget {
       },
       child: Scaffold(
         body: Center(
-          child: Transform.scale(
-            scale: 0.7,
-            child: SvgPicture.asset('assets/images/splash_new.svg'),
-          ),
+          child: Transform.scale(scale: 0.7, child: SvgPicture.asset(AppAssets.imgSplash)),
         ),
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 
+/// 앨범 탭 페이지
 class AlbumTabPage extends StatelessWidget {
   const AlbumTabPage({super.key});
 
@@ -7,6 +9,7 @@ class AlbumTabPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('앨범')),
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         child: Column(
           children: [

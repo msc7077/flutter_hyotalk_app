@@ -1,26 +1,167 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
+import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
+import 'package:flutter_hyotalk_app/core/widget/loading/app_loading_indicator.dart';
+import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:flutter_hyotalk_app/features/home/data/models/menu_category_model.dart';
+import 'package:flutter_hyotalk_app/features/home/data/repositories/home_repository.dart';
+import 'package:flutter_hyotalk_app/features/home/presentation/bloc/home_bloc.dart';
+import 'package:flutter_hyotalk_app/features/home/presentation/bloc/home_event.dart';
+import 'package:flutter_hyotalk_app/features/home/presentation/bloc/home_state.dart';
 import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeTabPage extends StatelessWidget {
+/// 홈 탭 페이지
+class HomeTabPage extends StatefulWidget {
   const HomeTabPage({super.key});
 
   @override
+  State<HomeTabPage> createState() => _HomeTabPageState();
+}
+
+class _HomeTabPageState extends State<HomeTabPage> {
+  late final HomeBloc _homeBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _homeBloc = HomeBloc(homeRepository: context.read<HomeRepository>());
+    _loadAgencyInfo();
+  }
+
+  @override
+  void dispose() {
+    _homeBloc.close();
+    super.dispose();
+  }
+
+  /// 기관 정보 로드
+  ///
+  /// AuthBloc에서 UserInfo를 가져와서 기관 아이디로 기관 정보를 로드합니다.
+  Future<void> _loadAgencyInfo() async {
+    try {
+      // AuthRepository 주입
+      final authRepository = context.read<AuthRepository>();
+      // AuthRepository에서 UserInfo를 가져와서 기관 아이디로 기관 정보를 로드합니다.
+      final userInfo = await authRepository.getUserInfo();
+
+      // 기관 아이디로 기관 정보 로드
+      _homeBloc.add(AgencyInfoLoadRequested(userInfo.agencyId));
+    } catch (e) {
+      // 에러 발생 시 빈 상태로 시작
+      // TODO: 에러 처리 (스낵바 표시 등)
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('홈')),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 이미지 배너 (가로 슬라이드)
-            _buildBannerSection(),
-            const SizedBox(height: 20),
-            // 그리드뷰 카테고리
-            _buildCategoryGrid(),
-          ],
+    return BlocProvider.value(
+      value: _homeBloc,
+      child: BlocListener<HomeBloc, HomeState>(
+        listener: (context, state) {
+          if (state is HomeFailure) {
+            // 에러 발생 시 다이얼로그 표시
+            AppErrorDialog.show(context, state.message, title: AppTexts.error);
+          }
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          body: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              final screenHeight = MediaQuery.of(context).size.height;
+              final headerHeight = screenHeight * 2 / 3; // 화면 높이의 2/3
+
+              return Stack(
+                children: [
+                  _buildAgencyImageBackground(context, state, headerHeight),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // 이미지 배너 (가로 슬라이드)
+                        _buildBannerSection(),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                        const SizedBox(height: 20),
+                        // 그리드뷰 카테고리
+                        _buildCategoryGrid(context, state),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
+  }
+
+  /// 기관 이미지 백그라운드
+  ///
+  /// 화면의 2/3
+  Widget _buildAgencyImageBackground(BuildContext context, HomeState state, double height) {
+    if (state is HomeLoaded && state.homeModel.agencyBackgroundUrl != null) {
+      return Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: height,
+        child: Image.network(
+          state.homeModel.agencyBackgroundUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: AppColors.greyE0E0E0,
+              child: const Center(child: Icon(Icons.image, size: 64, color: AppColors.grey9E9E9E)),
+            );
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              color: AppColors.greyF5F5F5,
+              child: const Center(child: CircularProgressIndicator()),
+            );
+          },
+        ),
+      );
+    } else if (state is HomeLoading) {
+      return Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: height,
+        child: Container(
+          color: AppColors.greyF5F5F5,
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
+    } else {
+      return Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: height,
+        child: Container(color: AppColors.greyE0E0E0),
+      );
+    }
   }
 
   Widget _buildBannerSection() {
@@ -47,15 +188,22 @@ class HomeTabPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryGrid() {
-    final categories = [
-      {'id': '1', 'name': '카테고리 1', 'icon': Icons.category},
-      {'id': '2', 'name': '카테고리 2', 'icon': Icons.category},
-      {'id': '3', 'name': '카테고리 3', 'icon': Icons.category},
-      {'id': '4', 'name': '카테고리 4', 'icon': Icons.category},
-      {'id': '5', 'name': '카테고리 5', 'icon': Icons.category},
-      {'id': '6', 'name': '카테고리 6', 'icon': Icons.category},
-    ];
+  Widget _buildCategoryGrid(BuildContext context, HomeState state) {
+    // State에서 메뉴 리스트 가져오기
+    List<MenuCategoryModel> menuCategories = [];
+    if (state is HomeLoaded) {
+      menuCategories = state.homeModel.menuCategories;
+    }
+
+    // 로딩 중이거나 메뉴가 없을 때
+    if (state is HomeLoading || menuCategories.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: state is HomeLoading
+            ? const Center(child: AppLoadingIndicator())
+            : const Center(child: Text('메뉴가 없습니다.')),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -68,24 +216,25 @@ class HomeTabPage extends StatelessWidget {
           mainAxisSpacing: 16,
           childAspectRatio: 1,
         ),
-        itemCount: categories.length,
+        itemCount: menuCategories.length,
         itemBuilder: (context, index) {
-          final category = categories[index];
-          return _buildCategoryCard(
-            category['id'] as String,
-            category['name'] as String,
-            category['icon'] as IconData,
-          );
+          final menu = menuCategories[index];
+          return _buildCategoryCard(menu.id, menu.name, menu.icon, menu.route);
         },
       ),
     );
   }
 
-  Widget _buildCategoryCard(String id, String name, IconData icon) {
+  Widget _buildCategoryCard(String id, String name, String icon, String? route) {
     return Builder(
       builder: (context) => InkWell(
         onTap: () {
-          context.pushNamed(AppRouterName.noticeListName);
+          // route가 있으면 해당 경로로 이동, 없으면 기본 공지사항 리스트로
+          if (route != null && route.isNotEmpty) {
+            context.push(route);
+          } else {
+            context.pushNamed(AppRouterName.noticeListName);
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(
@@ -96,7 +245,9 @@ class HomeTabPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 48, color: Colors.blue),
+              // TODO: icon이 URL이면 Image.network, 아니면 Icon 사용
+              // 임시로 Icon 사용
+              Icon(Icons.category, size: 48, color: Colors.blue),
               const SizedBox(height: 8),
               Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             ],

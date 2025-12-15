@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_assets.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/home/presentation/pages/home_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/work_diary/presentation/pages/work_diary_tab_page.dart';
@@ -29,24 +33,24 @@ class _MainPageState extends State<MainPage> {
   /// 하단 탭바 아이콘과 라벨 정의
   final List<NavigationDestination> _destinations = [
     NavigationDestination(
-      icon: SvgPicture.asset('assets/icons/icon_menu_home_outlined.svg'),
-      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_home.svg'),
-      label: '홈',
+      icon: SvgPicture.asset(AppAssets.iconMenuHomeOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconMenuHome),
+      label: AppTexts.home,
     ),
     NavigationDestination(
-      icon: SvgPicture.asset('assets/icons/icon_menu_album_outlined.svg'),
-      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_album.svg'),
-      label: '앨범',
+      icon: SvgPicture.asset(AppAssets.iconMenuAlbumOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconMenuAlbum),
+      label: AppTexts.album,
     ),
     NavigationDestination(
-      icon: SvgPicture.asset('assets/icons/icon_menu_work_outlined.svg'),
-      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_work.svg'),
-      label: '일지',
+      icon: SvgPicture.asset(AppAssets.iconMenuWorkOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconMenuWork),
+      label: AppTexts.workDiary,
     ),
     NavigationDestination(
-      icon: SvgPicture.asset('assets/icons/icon_menu_more_outlined.svg'),
-      selectedIcon: SvgPicture.asset('assets/icons/icon_menu_more.svg'),
-      label: '더보기',
+      icon: SvgPicture.asset(AppAssets.iconMenuMoreOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconMenuMore),
+      label: AppTexts.more,
     ),
   ];
 
@@ -119,12 +123,22 @@ class _MainPageState extends State<MainPage> {
         children: _pages, // 홈, 앨범, 일지 페이지들
       ),
       // 하단 네비게이션 바 (홈, 앨범, 일지, 더보기)
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex, // 현재 선택된 탭 인덱스
-        onDestinationSelected: _onDestinationSelected, // 탭 선택 시 페이지 이동
-        destinations: _destinations, // 탭 아이콘과 라벨 정의
-        indicatorColor: Colors.transparent, // 선택된 탭의 배경색 제거
-        backgroundColor: Color(0xFFFFFFFF),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          labelTextStyle: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppTextStyles.text10blackW400;
+            }
+            return AppTextStyles.text10blackW400.copyWith(color: AppColors.grey7E827A);
+          }),
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: _onDestinationSelected,
+          destinations: _destinations,
+          indicatorColor: AppColors.transparent,
+          backgroundColor: AppColors.surface,
+        ),
       ),
     );
   }

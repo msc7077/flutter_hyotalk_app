@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -111,6 +112,7 @@ class NoticeListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('공지사항')),
+      backgroundColor: AppColors.background,
       body: ListView.builder(
         padding: EdgeInsets.all(16.w),
         itemCount: _notices.length,
@@ -131,6 +133,7 @@ class NoticeListPage extends StatelessWidget {
   /// 공지사항 아이템
   Widget _buildNoticeItem(BuildContext context, Map<String, dynamic> notice) {
     return Card(
+      color: AppColors.surface,
       margin: EdgeInsets.only(bottom: 16.h),
       child: InkWell(
         onTap: () {
@@ -151,12 +154,12 @@ class NoticeListPage extends StatelessWidget {
                   // 작성자 이미지
                   CircleAvatar(
                     radius: 20.r,
-                    backgroundColor: Colors.grey[300],
+                    backgroundColor: AppColors.greyE0E0E0,
                     backgroundImage: (notice['authorImage'] as String).isNotEmpty
                         ? NetworkImage(notice['authorImage'] as String)
                         : null,
                     child: (notice['authorImage'] as String).isEmpty
-                        ? const Icon(Icons.person, color: Colors.grey)
+                        ? const Icon(Icons.person, color: AppColors.grey9E9E9E)
                         : null,
                   ),
                   SizedBox(width: 12.w),

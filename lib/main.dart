@@ -6,9 +6,12 @@ import 'package:flutter_hyotalk_app/core/config/env_config.dart';
 import 'package:flutter_hyotalk_app/core/init/app_initializer.dart';
 import 'package:flutter_hyotalk_app/core/service/app_bloc_observer_service.dart';
 import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_theme.dart';
 import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
+import 'package:flutter_hyotalk_app/features/home/data/repositories/home_repository.dart';
 import 'package:flutter_hyotalk_app/router/app_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -28,8 +31,11 @@ void main() async {
   }
 
   runApp(
-    RepositoryProvider(
-      create: (_) => AuthRepository(authDio: AppInitializer.instance.authDio),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => AuthRepository(authDio: AppInitializer.instance.authDio)),
+        RepositoryProvider(create: (_) => HomeRepository(homeDio: AppInitializer.instance.homeDio)),
+      ],
       child: BlocProvider(
         create: (context) =>
             AuthBloc(context.read<AuthRepository>())..add(AutoLoginCheckRequested()),
@@ -64,10 +70,10 @@ class _HyotalkAppState extends State<HyotalkApp> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: AppColors.transparent,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.black,
+        systemNavigationBarColor: AppColors.black,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
       child: SafeArea(
@@ -78,6 +84,7 @@ class _HyotalkAppState extends State<HyotalkApp> {
           child: MaterialApp.router(
             routerConfig: _appRouter.router,
             debugShowCheckedModeBanner: true,
+            theme: AppTheme.lightTheme,
           ),
         ),
       ),
