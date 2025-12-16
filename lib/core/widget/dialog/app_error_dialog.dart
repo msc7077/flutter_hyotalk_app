@@ -5,13 +5,20 @@ import 'package:go_router/go_router.dart';
 class AppErrorDialog extends StatelessWidget {
   final String message;
   final String title;
+  final VoidCallback? onConfirm;
 
-  const AppErrorDialog({super.key, required this.message, this.title = AppTexts.error});
+  const AppErrorDialog({
+    super.key,
+    required this.message,
+    this.title = AppTexts.error,
+    this.onConfirm,
+  });
 
-  static void show(BuildContext context, String message, {String? title}) {
+  static void show(BuildContext context, String message, {String? title, VoidCallback? onConfirm}) {
     showDialog(
       context: context,
-      builder: (context) => AppErrorDialog(message: message, title: title ?? AppTexts.error),
+      builder: (context) =>
+          AppErrorDialog(message: message, title: title ?? AppTexts.error, onConfirm: onConfirm),
     );
   }
 
@@ -20,7 +27,15 @@ class AppErrorDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(title),
       content: Text(message),
-      actions: [TextButton(onPressed: () => context.pop(), child: const Text(AppTexts.confirm))],
+      actions: [
+        TextButton(
+          onPressed: () {
+            context.pop();
+            onConfirm?.call();
+          },
+          child: const Text(AppTexts.confirm),
+        ),
+      ],
     );
   }
 }

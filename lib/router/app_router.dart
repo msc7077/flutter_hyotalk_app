@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/splash_page.dart';
 import 'package:flutter_hyotalk_app/features/main/presentation/pages/main_page.dart';
@@ -19,6 +20,34 @@ class AppRouter {
 
   late final GoRouter router = GoRouter(
     initialLocation: AppRouterPath.splash,
+    errorBuilder: (context, state) {
+      return Scaffold(
+        body: Builder(
+          builder: (dialogContext) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (dialogContext.mounted) {
+                AppErrorDialog.show(
+                  dialogContext,
+                  '없는 페이지입니다. 홈으로 이동합니다.',
+                  title: '오류',
+                  onConfirm: () {
+                    context.go(AppRouterPath.home);
+                  },
+                );
+
+                // 1초 후 자동으로 홈으로 이동
+                Future.delayed(const Duration(seconds: 1), () {
+                  if (dialogContext.mounted && context.mounted) {
+                    context.go(AppRouterPath.home);
+                  }
+                });
+              }
+            });
+            return const SizedBox.shrink();
+          },
+        ),
+      );
+    },
     routes: [
       GoRoute(
         path: AppRouterPath.splash,

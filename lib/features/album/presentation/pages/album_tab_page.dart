@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/router/app_router_path.dart';
+import 'package:go_router/go_router.dart';
 
 /// 앨범 탭 페이지
 class AlbumTabPage extends StatefulWidget {
@@ -80,12 +82,12 @@ class _AlbumTabPageState extends State<AlbumTabPage> with AutomaticKeepAliveClie
 
   Widget _buildCategoryGrid() {
     final categories = [
-      {'id': 'shop1', 'name': '앨범 카테고리 1', 'icon': Icons.alarm},
-      {'id': 'shop2', 'name': '앨범 카테고리 2', 'icon': Icons.alarm},
-      {'id': 'shop3', 'name': '앨범 카테고리 3', 'icon': Icons.alarm},
-      {'id': 'shop4', 'name': '앨범 카테고리 4', 'icon': Icons.alarm},
-      {'id': 'shop5', 'name': '앨범 카테고리 5', 'icon': Icons.alarm},
-      {'id': 'shop6', 'name': '앨범 카테고리 6', 'icon': Icons.alarm},
+      {'id': 'shop1', 'name': '앨범 카테고리 1', 'icon': Icons.alarm, 'route': 'album-list'},
+      {'id': 'shop2', 'name': '앨범 카테고리 2', 'icon': Icons.alarm, 'route': 'album-list'},
+      {'id': 'shop3', 'name': '앨범 카테고리 3', 'icon': Icons.alarm, 'route': 'album-list'},
+      {'id': 'shop4', 'name': '앨범 카테고리 4', 'icon': Icons.alarm, 'route': AppRouterPath.album},
+      {'id': 'shop5', 'name': '앨범 카테고리 5', 'icon': Icons.alarm, 'route': AppRouterPath.album},
+      {'id': 'shop6', 'name': '앨범 카테고리 6', 'icon': Icons.alarm, 'route': AppRouterPath.album},
     ];
 
     return Padding(
@@ -106,22 +108,33 @@ class _AlbumTabPageState extends State<AlbumTabPage> with AutomaticKeepAliveClie
             category['id'] as String,
             category['name'] as String,
             category['icon'] as IconData,
+            category['route'] as String,
           );
         },
       ),
     );
   }
 
-  Widget _buildCategoryCard(String id, String name, IconData icon) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: Colors.orange),
-          const SizedBox(height: 8),
-          Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-        ],
+  Widget _buildCategoryCard(String id, String name, IconData icon, String route) {
+    return Builder(
+      builder: (context) => InkWell(
+        onTap: () {
+          context.push(route);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 48, color: Colors.orange),
+              const SizedBox(height: 8),
+              Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            ],
+          ),
+        ),
       ),
     );
   }
