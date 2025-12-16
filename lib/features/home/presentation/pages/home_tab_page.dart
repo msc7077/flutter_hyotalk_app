@@ -27,6 +27,8 @@ class HomeTabPage extends StatefulWidget {
 
 class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClientMixin {
   late final HomeBloc _homeBloc;
+  late final ScrollController _scrollController;
+  double _savedScrollPosition = 0.0;
 
   /// 탭 이동 시에도 상태 유지
   @override
@@ -36,12 +38,14 @@ class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClient
   void initState() {
     super.initState();
     AppLoggerService.i('HomeTabPage initState');
+    _scrollController = ScrollController();
     _homeBloc = HomeBloc(homeRepository: context.read<HomeRepository>());
     _loadAgencyInfo();
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _homeBloc.close();
     super.dispose();
   }
@@ -63,6 +67,19 @@ class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClient
     }
   }
 
+  /// 탭으로 돌아왔을 때 호출 (MainPage에서 호출)
+  ///
+  /// 데이터를 최신 상태로 갱신합니다.
+  /// 스크롤 위치는 저장되어 유지됩니다.
+  void onTabResumed() {
+    AppLoggerService.i('HomeTabPage onTabResumed - 데이터 리로드');
+    // 현재 스크롤 위치 저장
+    if (_scrollController.hasClients) {
+      _savedScrollPosition = _scrollController.offset;
+    }
+    _loadAgencyInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     // AutomaticKeepAliveClientMixin을 사용할 때 필수
@@ -75,45 +92,77 @@ class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClient
           if (state is HomeFailure) {
             // 에러 발생 시 다이얼로그 표시
             AppErrorDialog.show(context, state.message, title: AppTexts.error);
+          } else if (state is HomeLoaded && _savedScrollPosition > 0) {
+            // 데이터 로드 완료 후 스크롤 위치 복원
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_scrollController.hasClients) {
+                _scrollController.jumpTo(_savedScrollPosition);
+                _savedScrollPosition = 0.0; // 복원 후 초기화
+              }
+            });
           }
         },
         child: Scaffold(
           backgroundColor: AppColors.background,
-          body: BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, state) {
-              final screenHeight = context.screenHeight;
-              final headerHeight = screenHeight * 2 / 3; // 화면 높이의 2/3
+          body: Builder(
+            builder: (context) {
+              final headerHeight = context.screenHeight23; // 화면 높이의 2/3
 
               return Stack(
                 children: [
-                  _buildAgencyImageBackground(context, state, headerHeight),
+                  // 배경 이미지는 state에 따라 변경
+                  BlocBuilder<HomeBloc, HomeState>(
+                    builder: (context, state) {
+                      return _buildAgencyImageBackground(context, state, headerHeight);
+                    },
+                  ),
+                  // SingleChildScrollView는 항상 유지하여 스크롤 위치 보존
                   SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        // 이미지 배너 (가로 슬라이드)
-                        _buildBannerSection(),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                        const SizedBox(height: 20),
-                        // 그리드뷰 카테고리
-                        _buildCategoryGrid(context, state),
-                      ],
+                    key: const PageStorageKey('home_scroll'),
+                    controller: _scrollController,
+                    child: BlocBuilder<HomeBloc, HomeState>(
+                      // 실제로 데이터가 변경되었을 때만 리빌드
+                      buildWhen: (previous, current) {
+                        // 로딩 상태 변경은 무시 (스크롤 위치 유지)
+                        if (previous is HomeLoading && current is HomeLoading) {
+                          return false;
+                        }
+                        // 에러 상태는 리빌드 불필요
+                        if (current is HomeFailure) {
+                          return false;
+                        }
+                        return true;
+                      },
+                      builder: (context, state) {
+                        return Column(
+                          key: const ValueKey('home_content'),
+                          children: [
+                            // 이미지 배너 (가로 슬라이드)
+                            _buildBannerSection(),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                            const SizedBox(height: 20),
+                            // 그리드뷰 카테고리
+                            _buildCategoryGrid(context, state),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -217,7 +266,7 @@ class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClient
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
+          crossAxisCount: 4,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           childAspectRatio: 1,

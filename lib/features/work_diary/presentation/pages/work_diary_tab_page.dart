@@ -1,17 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 
 /// 업무일지 탭 페이지
-class WorkDiaryTabPage extends StatelessWidget {
+class WorkDiaryTabPage extends StatefulWidget {
   const WorkDiaryTabPage({super.key});
 
   @override
+  State<WorkDiaryTabPage> createState() => _WorkDiaryTabPageState();
+}
+
+class _WorkDiaryTabPageState extends State<WorkDiaryTabPage> with AutomaticKeepAliveClientMixin {
+  late final ScrollController _scrollController;
+  double _savedScrollPosition = 0.0;
+
+  /// 탭 이동 시에도 상태 유지
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    AppLoggerService.i('WorkDiaryTabPage initState');
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// 탭으로 돌아왔을 때 호출 (MainPage에서 호출)
+  ///
+  /// 데이터를 최신 상태로 갱신합니다.
+  /// 스크롤 위치는 저장되어 유지됩니다.
+  void onTabResumed() {
+    AppLoggerService.i('WorkDiaryTabPage onTabResumed - 데이터 리로드');
+    // 현재 스크롤 위치 저장
+    if (_scrollController.hasClients) {
+      _savedScrollPosition = _scrollController.offset;
+    }
+    // TODO: 업무일지 리스트 리로드 로직 추가
+    // 예: _workDiaryBloc.add(WorkDiaryListLoadRequested());
+
+    // 데이터 리로드 완료 후 스크롤 위치 복원 (Bloc 사용 시 BlocListener에서 처리)
+    // 현재는 즉시 복원
+    if (_savedScrollPosition > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_savedScrollPosition);
+          _savedScrollPosition = 0.0; // 복원 후 초기화
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // AutomaticKeepAliveClientMixin을 사용할 때 필수
+    super.build(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('업무일지')),
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
+        key: const PageStorageKey('work_diary_scroll'),
+        controller: _scrollController,
         child: Column(
+          key: const ValueKey('work_diary_content'),
           children: [
             // 이미지 배너
             _buildBannerSection(),

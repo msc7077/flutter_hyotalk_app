@@ -30,6 +30,14 @@ class _MainPageState extends State<MainPage> {
   /// 현재 선택된 탭 인덱스 초기값은 0으로 설정
   int _currentIndex = 0;
 
+  /// 이전 선택된 탭 인덱스 (리로드 판단용)
+  int _previousIndex = 0;
+
+  /// 각 탭 페이지의 GlobalKey (리로드 신호 전달용)
+  final GlobalKey _homeTabKey = GlobalKey();
+  final GlobalKey _albumTabKey = GlobalKey();
+  final GlobalKey _workDiaryTabKey = GlobalKey();
+
   /// 하단 탭바 아이콘과 라벨 정의
   final List<NavigationDestination> _destinations = [
     NavigationDestination(
@@ -56,7 +64,11 @@ class _MainPageState extends State<MainPage> {
 
   /// 탭 페이지들
   /// 탭으로만 이동될 페이지들
-  final List<Widget> _pages = [const HomeTabPage(), const AlbumTabPage(), const WorkDiaryTabPage()];
+  late final List<Widget> _pages = [
+    HomeTabPage(key: _homeTabKey),
+    AlbumTabPage(key: _albumTabKey),
+    WorkDiaryTabPage(key: _workDiaryTabKey),
+  ];
 
   @override
   void initState() {
@@ -81,12 +93,40 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  /// PageView 변경 시 인덱스 동기화
+  /// PageView 변경 시 인덱스 동기화 및 리로드
   void _onPageChanged(int index) {
     if (_currentIndex != index) {
       setState(() {
+        _previousIndex = _currentIndex;
         _currentIndex = index;
       });
+
+      // 탭으로 돌아왔을 때 리로드 (다른 탭에서 돌아온 경우)
+      _reloadCurrentTab(index);
+    }
+  }
+
+  /// 현재 탭 리로드
+  ///
+  /// 탭으로 돌아왔을 때 데이터를 최신 상태로 갱신합니다.
+  /// 스크롤 위치는 AutomaticKeepAliveClientMixin에 의해 자동으로 유지됩니다.
+  void _reloadCurrentTab(int index) {
+    // 더보기 탭(index 3)은 리로드 불필요
+    if (index >= _pages.length) return;
+
+    // 탭이 변경되었을 때만 리로드 (같은 탭을 다시 선택한 경우는 제외)
+    if (_previousIndex != index) {
+      switch (index) {
+        case 0: // 홈 탭
+          (_homeTabKey.currentState as dynamic)?.onTabResumed();
+          break;
+        case 1: // 앨범 탭
+          (_albumTabKey.currentState as dynamic)?.onTabResumed();
+          break;
+        case 2: // 일지 탭
+          (_workDiaryTabKey.currentState as dynamic)?.onTabResumed();
+          break;
+      }
     }
   }
 
@@ -102,10 +142,14 @@ class _MainPageState extends State<MainPage> {
           try {
             // PageController가 위젯 트리에 연결되어 있는지 확인
             if (_pageController.hasClients) {
+              final previousIndex = _currentIndex;
               _pageController.jumpToPage(index);
               setState(() {
+                _previousIndex = previousIndex;
                 _currentIndex = index;
               });
+              // 탭 변경 후 리로드
+              _reloadCurrentTab(index);
             }
           } catch (e) {
             // PageController가 아직 준비되지 않은 경우 무시

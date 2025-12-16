@@ -21,6 +21,8 @@ extension ContextMediaQueryExtension on BuildContext {
   Size get screenSize => media.size;
   double get screenWidth => screenSize.width;
   double get screenHeight => screenSize.height;
+  double get screenHeight13 => screenHeight * 1 / 3;
+  double get screenHeight23 => screenHeight * 2 / 3;
 
   /// SafeArea 제외 후 사용 가능한 영역
   EdgeInsets get safePadding => media.padding;
