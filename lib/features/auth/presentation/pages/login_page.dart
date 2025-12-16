@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/extensions/context_media_query_extension.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_dimensions.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
@@ -51,12 +52,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight:
-                          MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.top -
-                          MediaQuery.of(context).padding.bottom,
-                    ),
+                    constraints: BoxConstraints(minHeight: context.safeHeight),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW20),
                       child: Column(

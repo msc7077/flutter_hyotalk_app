@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/extensions/context_media_query_extension.dart';
+import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
@@ -23,12 +25,17 @@ class HomeTabPage extends StatefulWidget {
   State<HomeTabPage> createState() => _HomeTabPageState();
 }
 
-class _HomeTabPageState extends State<HomeTabPage> {
+class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClientMixin {
   late final HomeBloc _homeBloc;
+
+  /// 탭 이동 시에도 상태 유지
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
+    AppLoggerService.i('HomeTabPage initState');
     _homeBloc = HomeBloc(homeRepository: context.read<HomeRepository>());
     _loadAgencyInfo();
   }
@@ -58,6 +65,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   @override
   Widget build(BuildContext context) {
+    // AutomaticKeepAliveClientMixin을 사용할 때 필수
+    super.build(context);
+
     return BlocProvider.value(
       value: _homeBloc,
       child: BlocListener<HomeBloc, HomeState>(
@@ -71,7 +81,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
           backgroundColor: AppColors.background,
           body: BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
-              final screenHeight = MediaQuery.of(context).size.height;
+              final screenHeight = context.screenHeight;
               final headerHeight = screenHeight * 2 / 3; // 화면 높이의 2/3
 
               return Stack(
@@ -138,7 +148,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
             if (loadingProgress == null) return child;
             return Container(
               color: AppColors.greyF5F5F5,
-              child: const Center(child: CircularProgressIndicator()),
+              child: const Center(child: AppLoadingIndicator()),
             );
           },
         ),
@@ -151,7 +161,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
         height: height,
         child: Container(
           color: AppColors.greyF5F5F5,
-          child: const Center(child: CircularProgressIndicator()),
+          child: const Center(child: AppLoadingIndicator()),
         ),
       );
     } else {
