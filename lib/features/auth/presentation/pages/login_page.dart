@@ -5,7 +5,7 @@ import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_dimensions.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
-import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
+import 'package:flutter_hyotalk_app/core/widget/dialog/app_common_dialog.dart';
 import 'package:flutter_hyotalk_app/core/widget/loading/app_loading_indicator.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           // 로그인 성공 시 홈으로 이동
           context.go(AppRouterPath.home);
         } else if (state is AuthFailure) {
-          AppErrorDialog.show(context, state.message, title: AppTexts.loginFailed);
+          AppCommonDialog.show(context, state.message, title: AppTexts.loginFailed);
         }
       },
       child: BlocBuilder<AuthBloc, AuthState>(

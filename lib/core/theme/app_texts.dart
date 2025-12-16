@@ -49,4 +49,5 @@ class AppTexts {
   static const String loginFailedTokenIssue = '토큰을 발급받지 못했습니다. 다시 시도해주세요.';
   static const String networkError = '네트워크 오류가 발생했습니다.';
   static const String unknownError = '알 수 없는 오류가 발생했습니다.';
+  static const String pageNotFound = '없는 페이지입니다. 홈으로 이동합니다.';
 }

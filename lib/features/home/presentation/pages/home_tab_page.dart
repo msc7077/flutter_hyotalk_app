@@ -5,7 +5,7 @@ import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
-import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
+import 'package:flutter_hyotalk_app/core/widget/dialog/app_common_dialog.dart';
 import 'package:flutter_hyotalk_app/core/widget/loading/app_loading_indicator.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
@@ -91,7 +91,7 @@ class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClient
         listener: (context, state) {
           if (state is HomeFailure) {
             // 에러 발생 시 다이얼로그 표시
-            AppErrorDialog.show(context, state.message, title: AppTexts.error);
+            AppCommonDialog.show(context, state.message, title: AppTexts.error);
           } else if (state is HomeLoaded && _savedScrollPosition > 0) {
             // 데이터 로드 완료 후 스크롤 위치 복원
             WidgetsBinding.instance.addPostFrameCallback((_) {
