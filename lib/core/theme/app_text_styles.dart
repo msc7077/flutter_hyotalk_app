@@ -56,6 +56,12 @@ class AppTextStyles {
     color: AppColors.black,
     fontFamily: fontFamily,
   );
+  static TextStyle get text24blackW700 => TextStyle(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w700,
+    color: AppColors.black,
+    fontFamily: fontFamily,
+  );
   static TextStyle get text32blackW700 => TextStyle(
     fontSize: 32.sp,
     fontWeight: FontWeight.bold,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/core/widget/dialog/app_error_dialog.dart';
 import 'package:flutter_hyotalk_app/core/widget/loading/app_loading_indicator.dart';
@@ -176,12 +177,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
               color: Colors.blue.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: Text(
-                '배너 ${index + 1}',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
+            child: Center(child: Text('배너 ${index + 1}', style: AppTextStyles.text24blackW700)),
           );
         },
       ),
