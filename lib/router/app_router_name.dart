@@ -9,6 +9,16 @@ class AppRouterName {
 
   // 스플레시 페이지
   static const String splashName = 'splash';
+  // 본인인증 페이지
+  static const String selfCertificationName = 'self-certification';
+  // 본인인증 웹뷰 페이지
+  static const String selfCertificationWebViewName = 'self-certification-webview';
+  // 회원가입 페이지
+  static const String registerName = 'register';
+  // 아이디 찾기 페이지
+  static const String findIdName = 'find-id';
+  // 비밀번호 재설정 페이지
+  static const String resetPasswordName = 'reset-password';
   // 로그인 페이지
   static const String loginName = 'login';
   // 메인 - 홈 페이지

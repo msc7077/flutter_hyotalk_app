@@ -16,6 +16,8 @@ class AppDimensions {
   static double get spacingW32 => 32.w;
 
   // 수직 간격
+  static double get spacingV0_0 => 0.0;
+  static double get spacingV0_5 => 0.5.h;
   static double get spacingV4 => 4.h;
   static double get spacingV8 => 8.h;
   static double get spacingV12 => 12.h;

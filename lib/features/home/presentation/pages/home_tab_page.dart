@@ -32,7 +32,7 @@ class _HomeTabPageState extends State<HomeTabPage> with AutomaticKeepAliveClient
 
   /// 탭 이동 시에도 상태 유지
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => true; // TODO: 성능이슈 발생 시 수정
 
   @override
   void initState() {

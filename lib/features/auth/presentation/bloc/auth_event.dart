@@ -7,6 +7,17 @@ abstract class AuthEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// 자동로그인 체크박스 토글
+/// @param isAutoLogin 자동로그인 여부
+class AutoLoginCheckboxToggled extends AuthEvent {
+  final bool isAutoLogin;
+
+  const AutoLoginCheckboxToggled({required this.isAutoLogin});
+
+  @override
+  List<Object?> get props => [isAutoLogin];
+}
+
 /// 자동로그인 체크
 class AutoLoginCheckRequested extends AuthEvent {}
 
@@ -16,11 +27,7 @@ class LoginRequested extends AuthEvent {
   final String password;
   final bool isAutoLogin;
 
-  const LoginRequested({
-    required this.id,
-    required this.password,
-    this.isAutoLogin = false,
-  });
+  const LoginRequested({required this.id, required this.password, this.isAutoLogin = false});
 
   @override
   List<Object?> get props => [id, password, isAutoLogin];
@@ -28,3 +35,6 @@ class LoginRequested extends AuthEvent {
 
 /// 로그아웃 요청 이벤트
 class LogoutRequested extends AuthEvent {}
+
+/// 본인인증 토큰 요청 이벤트
+class NiceTokenRequested extends AuthEvent {}

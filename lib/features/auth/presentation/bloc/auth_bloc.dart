@@ -13,10 +13,20 @@ import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.d
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
 
-  AuthBloc(this._authRepository) : super(AuthInitial()) {
+  AuthBloc(this._authRepository) : super(const AuthInitial()) {
+    on<AutoLoginCheckboxToggled>(_onAutoLoginCheckboxToggled);
     on<AutoLoginCheckRequested>(_onAutoLoginCheckRequested);
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
+    // on<NiceTokenRequested>(_onNiceTokenRequested);
+  }
+
+  /// 자동로그인 체크박스 토글
+  Future<void> _onAutoLoginCheckboxToggled(
+    AutoLoginCheckboxToggled event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthInitial(isAutoLogin: event.isAutoLogin));
   }
 
   /// 자동로그인 체크
@@ -104,4 +114,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await _authRepository.requestLogout();
     emit(AuthUnauthenticated());
   }
+
+  /// Nice 본인인증 토큰 요청
+  // Future<void> _onNiceTokenRequested(NiceTokenRequested event, Emitter<AuthState> emit) async {
+  //   emit(NiceTokenLoading());
+  //   try {
+  //     final niceToken = await _authRepository.getNiceToken();
+  //     emit(NiceTokenCompleted(niceToken: niceToken));
+  //   } on DioException catch (e) {
+  //     final errorMessage = e.message ?? '본인인증 토큰을 가져오는데 실패했습니다.';
+  //     emit(NiceTokenFailure(errorMessage));
+  //   } catch (e) {
+  //     emit(NiceTokenFailure('알 수 없는 오류가 발생했습니다: ${e.toString()}'));
+  //   }
+  // }
 }

@@ -10,9 +10,11 @@ import 'package:flutter_hyotalk_app/core/widget/loading/app_loading_indicator.da
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:go_router/go_router.dart';
 
+/// 로그인 페이지
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -24,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _idTextEditingController = TextEditingController();
   final _passwordTextEditingController = TextEditingController();
-  bool _isAutoLogin = false;
 
   @override
   void dispose() {
@@ -47,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           final isLoading = state is AuthLoading;
+          final isAutoLogin = state is AuthInitial ? state.isAutoLogin : false;
           return Scaffold(
             body: Stack(
               children: [
@@ -123,24 +125,24 @@ class _LoginPageState extends State<LoginPage> {
                                       children: [
                                         Checkbox(
                                           side: WidgetStateBorderSide.resolveWith(
-                                            (states) => _isAutoLogin == true
+                                            (states) => isAutoLogin
                                                 ? BorderSide(
                                                     width: AppDimensions.spacingW0_0,
                                                     color: AppColors.transparent,
                                                   )
                                                 : BorderSide(
                                                     width: AppDimensions.spacingW1_5,
-                                                    color: AppColors.black26,
+                                                    color: AppColors.black_50_opacity,
                                                   ),
                                           ),
-                                          activeColor: _isAutoLogin == true
+                                          activeColor: isAutoLogin
                                               ? AppColors.primary
                                               : AppColors.transparent,
-                                          value: _isAutoLogin,
+                                          value: isAutoLogin,
                                           onChanged: (bool? value) {
-                                            setState(() {
-                                              _isAutoLogin = value ?? false;
-                                            });
+                                            context.read<AuthBloc>().add(
+                                              AutoLoginCheckboxToggled(isAutoLogin: value ?? false),
+                                            );
                                           },
                                         ),
                                         Text(
@@ -159,8 +161,8 @@ class _LoginPageState extends State<LoginPage> {
                                   height: AppDimensions.buttonHeight,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0XFFFDE048),
-                                      elevation: 0.0,
+                                      backgroundColor: AppColors.primary,
+                                      elevation: AppDimensions.spacingV0_0,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(AppDimensions.radius50),
                                       ),
@@ -174,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 LoginRequested(
                                                   id: _idTextEditingController.text,
                                                   password: _passwordTextEditingController.text,
-                                                  isAutoLogin: _isAutoLogin,
+                                                  isAutoLogin: isAutoLogin,
                                                 ),
                                               );
                                             }
@@ -197,15 +199,17 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
-                                elevation: 0.0,
+                                elevation: AppDimensions.spacingV0_0,
                                 shape: RoundedRectangleBorder(
                                   side: const BorderSide(color: AppColors.orangeEB5E2B),
                                   borderRadius: BorderRadius.circular(AppDimensions.radius50),
                                 ),
                               ),
                               onPressed: () {
-                                // TODO: 회원가입 화면으로 이동
-                                // context.go('/register');
+                                context.pushNamed(
+                                  AppRouterName.selfCertificationName,
+                                  queryParameters: {'nextRoute': AppRouterName.registerName},
+                                );
                               },
                               child: Text(
                                 AppTexts.register,
@@ -222,8 +226,10 @@ class _LoginPageState extends State<LoginPage> {
                               Flexible(
                                 child: TextButton(
                                   onPressed: () {
-                                    // TODO: 아이디 찾기 화면으로 이동
-                                    // context.go('/find-id');
+                                    context.pushNamed(
+                                      AppRouterName.selfCertificationName,
+                                      queryParameters: {'nextRoute': AppRouterName.findIdName},
+                                    );
                                   },
                                   child: Text(
                                     AppTexts.findId,
@@ -242,8 +248,12 @@ class _LoginPageState extends State<LoginPage> {
                               Flexible(
                                 child: TextButton(
                                   onPressed: () {
-                                    // TODO: 비밀번호 재설정 화면으로 이동
-                                    // context.go('/reset-password');
+                                    context.pushNamed(
+                                      AppRouterName.selfCertificationName,
+                                      queryParameters: {
+                                        'nextRoute': AppRouterName.resetPasswordName,
+                                      },
+                                    );
                                   },
                                   child: Text(
                                     AppTexts.resetPassword,
@@ -264,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                 if (isLoading)
                   AbsorbPointer(
                     child: Container(
-                      color: AppColors.black.withValues(alpha: 0.5),
+                      color: AppColors.black_50_opacity,
                       child: const Center(child: AppLoadingIndicator()),
                     ),
                   ),

@@ -8,6 +8,16 @@ class AppRouterPath {
 
   // 스플레시 페이지
   static const String splash = '/splash';
+  // 본인인증 페이지
+  static const String selfCertification = '/self-certification';
+  // 본인인증 웹뷰 페이지
+  static const String selfCertificationWebView = '/self-certification-webview';
+  // 회원가입 페이지
+  static const String register = '/register';
+  // 아이디 찾기 페이지
+  static const String findId = '/find-id';
+  // 비밀번호 재설정 페이지
+  static const String resetPassword = '/reset-password';
   // 로그인 페이지
   static const String login = '/login';
   // 메인 - 홈 페이지

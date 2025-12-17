@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_dimensions.dart';
 import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -172,7 +173,7 @@ class NoticeListPage extends StatelessWidget {
                           notice['authorName'] as String,
                           style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
                         ),
-                        SizedBox(height: 4.h),
+                        SizedBox(height: AppDimensions.spacingV4),
                         Row(
                           children: [
                             Text(

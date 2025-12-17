@@ -50,4 +50,5 @@ class AppTexts {
   static const String networkError = '네트워크 오류가 발생했습니다.';
   static const String unknownError = '알 수 없는 오류가 발생했습니다.';
   static const String pageNotFound = '없는 페이지입니다. 홈으로 이동합니다.';
+  static const String niceTokenFailed = '본인인증 토큰을 가져오는데 실패했습니다.';
 }
