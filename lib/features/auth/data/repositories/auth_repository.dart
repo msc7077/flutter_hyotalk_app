@@ -60,11 +60,19 @@ class AuthRepository {
   Future<UserInfoModel> getUserInfo() async {
     // 임시 데이터 (실제 API 응답 형식)
     await Future.delayed(const Duration(milliseconds: 300));
-    return UserInfoModel.fromJson({
-      'user_id': 'user123',
-      'agency_id': 'agency123',
-      'permissions': ['read', 'write', 'admin'],
-    });
+    return const UserInfoModel(
+      id: '1',
+      userId: 'user123',
+      userName: '홍길동',
+      userEmail: 'hong@gmail.com',
+      userPhone: '010-1234-5678',
+      userAddress: '서울시 강남구 역삼동',
+      userBirthday: '1990-01-01',
+      userGender: 'M',
+      userProfileImageUrl: 'https://picsum.photos/200/300',
+      agencyId: '1234567890',
+      role: UserRole.admin,
+    );
   }
 
   /// 로그아웃
@@ -95,6 +103,9 @@ class AuthRepository {
   /// Auth 실패 예외 처리
   ///
   /// response 값과 message 값을 받아서 예외 처리
+  /// bloc에서 DioException 예외처리에 사용됨
+  /// customErrorMessage 에 메시지를 저장하고 bloc에서 메시지를 받아 상태를 변경하고
+  /// login_page에서 AuthFailure 상태일 경우 메시지를 표시하기 위함이다.
   Never _throwAuthFailure(Response res, String message) {
     res.requestOptions.extra['customErrorMessage'] = message;
     throw DioException(

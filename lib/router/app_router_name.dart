@@ -25,8 +25,12 @@ class AppRouterName {
   static const String homeName = 'home';
   // 메인 - 앨범 페이지
   static const String albumName = 'album';
+  // 앨범 - 상세
+  static const String albumDetailName = 'album-detail';
   // 메인 - 일지 페이지
   static const String workDiaryName = 'work-diary';
+  // 업무일지 - 상세
+  static const String workDiaryDetailName = 'work-diary-detail';
   // 메인 - 더보기 페이지
   static const String moreName = 'more';
   // 공지사항 - 리스트 페이지

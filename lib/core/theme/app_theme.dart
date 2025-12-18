@@ -21,7 +21,7 @@ class AppTheme {
 
       // AppBar 테마
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.black),
       ),

@@ -18,11 +18,11 @@ class AppInitializer {
   static final instance = AppInitializer._internal();
 
   late final Dio authDio;
-  late final Dio homeDio;
+  late final Dio hyotalkDio;
 
   Future<void> init() async {
     authDio = DioClient.createAuthClient();
-    homeDio = DioClient.createHyotalkClient();
+    hyotalkDio = DioClient.createHyotalkClient();
     await AppSecureStorage.init();
     await AppPreferenceStorage.init();
   }

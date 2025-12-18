@@ -7,13 +7,17 @@ abstract class HomeEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// 기관 정보 로드 요청 (기관 아이디로)
-class AgencyInfoLoadRequested extends HomeEvent {
-  final String agencyId;
+/// 홈 리스트 로드 요청
+class HomeListRequested extends HomeEvent {
+  final bool forceRefresh;
 
-  const AgencyInfoLoadRequested(this.agencyId);
+  const HomeListRequested({this.forceRefresh = false});
 
   @override
-  List<Object?> get props => [agencyId];
+  List<Object?> get props => [forceRefresh];
 }
 
+/// 탭으로 돌아왔을 때 호출 (캐시 확인 후 필요 시 리프레시)
+class HomeTabResumed extends HomeEvent {
+  const HomeTabResumed();
+}

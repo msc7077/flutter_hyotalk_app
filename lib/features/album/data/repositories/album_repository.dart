@@ -3,16 +3,16 @@ import 'package:flutter_hyotalk_app/core/mock/mock_api.dart';
 import 'package:flutter_hyotalk_app/features/album/data/models/album_item_model.dart';
 import 'package:flutter_hyotalk_app/features/album/data/models/album_list_response_model.dart';
 
-/// Home 관련 네트워크 요청 처리
-class HomeRepository {
+/// Album 관련 네트워크 요청 처리
+class AlbumRepository {
   final Dio hyotalkDio;
 
-  HomeRepository({required this.hyotalkDio});
+  AlbumRepository({required this.hyotalkDio});
 
   /// 앨범 리스트 조회 (Mock)
   ///
   /// 실제 API 응답처럼 meta/페이징 정보를 포함합니다.
-  Future<MockApiEnvelope<AlbumListResponseModel>> getHomeList({
+  Future<MockApiEnvelope<AlbumListResponseModel>> getAlbumList({
     int page = 1,
     int pageSize = 20,
   }) async {

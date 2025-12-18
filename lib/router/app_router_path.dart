@@ -24,8 +24,12 @@ class AppRouterPath {
   static const String home = '/home';
   // 메인 - 앨범 페이지
   static const String album = '/album';
+  // 앨범 - 상세
+  static const String albumDetail = '/album/:id';
   // 메인 - 일지 페이지
   static const String workDiary = '/work-diary';
+  // 업무일지 - 상세
+  static const String workDiaryDetail = '/work-diary/:id';
   // 메인 - 더보기 페이지
   static const String more = '/more';
   // 공지사항 - 리스트 페이지
@@ -57,5 +61,5 @@ class AppRouterPath {
   // 승인 및 초대 - 리스트 페이지
   static const String approveAndInvite = '/approve-and-invite';
   // 홈 - 탭 라우트
-  static const List<String> homeTabRoutes = [home, album, workDiary, more];
+  static const List<String> homeTabRoutes = [home, album, workDiary];
 }

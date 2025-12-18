@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_secure_storage.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
@@ -101,11 +102,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // Auth 인증 완료 상태 발행
       emit(AuthAuthenticated(token: token, userInfo: userInfo));
     } on DioException catch (e) {
-      final errorMessage =
-          e.requestOptions.extra['customErrorMessage'] as String? ?? '로그인에 실패했습니다.';
-      emit(AuthFailure(errorMessage));
+      final errorMessage = e.requestOptions.extra['customErrorMessage'] as String?;
+      emit(AuthFailure(errorMessage ?? AppTexts.loginFailed));
     } catch (e) {
-      emit(AuthFailure('알 수 없는 오류가 발생했습니다: ${e.toString()}'));
+      emit(const AuthFailure(AppTexts.loginFailed));
     }
   }
 

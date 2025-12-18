@@ -1,15 +1,32 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/core/widget/dialog/app_common_dialog.dart';
+import 'package:flutter_hyotalk_app/features/album/data/models/album_item_model.dart';
+import 'package:flutter_hyotalk_app/features/album/data/repositories/album_repository.dart';
+import 'package:flutter_hyotalk_app/features/album/presentation/bloc/album_bloc.dart';
+import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_detail_page.dart';
+import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_tab_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/pages/find_id_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/login_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/pages/register_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/pages/self_certification_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/pages/self_certification_webview.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/splash_page.dart';
+import 'package:flutter_hyotalk_app/features/home/data/repositories/home_repository.dart';
+import 'package:flutter_hyotalk_app/features/home/presentation/bloc/home_bloc.dart';
+import 'package:flutter_hyotalk_app/features/home/presentation/pages/home_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/main/presentation/pages/main_page.dart';
 import 'package:flutter_hyotalk_app/features/more/presentation/pages/more_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_detail_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_form_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_list_page.dart';
+import 'package:flutter_hyotalk_app/features/work_diary/data/models/work_diary_item_model.dart';
+import 'package:flutter_hyotalk_app/features/work_diary/presentation/pages/work_diary_detail_page.dart';
+import 'package:flutter_hyotalk_app/features/work_diary/presentation/pages/work_diary_tab_page.dart';
 import 'package:flutter_hyotalk_app/router/app_router_name.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +36,11 @@ import 'package:go_router/go_router.dart';
 class AppRouter {
   AppRouter();
 
+  // 2depth(전체화면) 라우트를 올릴 root navigator
+  static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
   late final GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: AppRouterPath.splash,
     errorBuilder: (context, state) {
       return Scaffold(
@@ -35,8 +56,6 @@ class AppRouter {
                     context.go(AppRouterPath.home);
                   },
                 );
-
-                // 1초 후 자동으로 홈으로 이동
                 Future.delayed(const Duration(seconds: 1), () {
                   if (dialogContext.mounted && context.mounted) {
                     context.go(AppRouterPath.home);
@@ -62,62 +81,192 @@ class AppRouter {
         pageBuilder: (context, state) =>
             _buildFadePage(context, state, const LoginPage(), isFadeIn: true),
       ),
-      ShellRoute(
-        pageBuilder: (context, state, child) {
-          return _buildFadePage(context, state, MainPage(child: child), isFadeIn: true);
+      GoRoute(
+        path: AppRouterPath.selfCertification,
+        name: AppRouterName.selfCertificationName,
+        pageBuilder: (context, state) {
+          final nextRoute = state.uri.queryParameters['nextRoute'];
+          final error = state.uri.queryParameters['error'];
+          return _buildSlidePage(
+            context,
+            state,
+            SelfCertificationPage(nextRoute: nextRoute, errorMessage: error),
+          );
         },
-        routes: [
-          GoRoute(
-            path: AppRouterPath.home,
-            name: AppRouterName.homeName,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-          GoRoute(
-            path: AppRouterPath.album,
-            name: AppRouterName.albumName,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-          GoRoute(
-            path: AppRouterPath.workDiary,
-            name: AppRouterName.workDiaryName,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-        ],
       ),
+      GoRoute(
+        path: AppRouterPath.selfCertificationWebView,
+        name: AppRouterName.selfCertificationWebViewName,
+        pageBuilder: (context, state) {
+          final nextRoute = state.uri.queryParameters['nextRoute'];
+          return _buildSlidePage(
+            context,
+            state,
+            SelfCertificationWebViewPage(nextRoute: nextRoute),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRouterPath.register,
+        name: AppRouterName.registerName,
+        pageBuilder: (context, state) {
+          final ci = state.uri.queryParameters['ci'];
+          final cd = state.uri.queryParameters['cd'];
+          return _buildSlidePage(context, state, RegisterPage(ci: ci, cd: cd));
+        },
+      ),
+      GoRoute(
+        path: AppRouterPath.findId,
+        name: AppRouterName.findIdName,
+        pageBuilder: (context, state) {
+          final ci = state.uri.queryParameters['ci'];
+          final cd = state.uri.queryParameters['cd'];
+          return _buildSlidePage(context, state, FindIdPage(ci: ci, cd: cd));
+        },
+      ),
+      GoRoute(
+        path: AppRouterPath.resetPassword,
+        name: AppRouterName.resetPasswordName,
+        pageBuilder: (context, state) {
+          final ci = state.uri.queryParameters['ci'];
+          final cd = state.uri.queryParameters['cd'];
+          return _buildSlidePage(context, state, ResetPasswordPage(ci: ci, cd: cd));
+        },
+      ),
+
+      // ===== 2depth 이상은 전체 페이지(root navigator)로 띄움 (바텀탭 숨김) =====
       GoRoute(
         path: AppRouterPath.more,
         name: AppRouterName.moreName,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _buildSlidePage(context, state, const MoreTabPage()),
       ),
       GoRoute(
         path: AppRouterPath.noticeList,
         name: AppRouterName.noticeListName,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _buildSlidePage(context, state, const NoticeListPage()),
       ),
       GoRoute(
         path: AppRouterPath.noticeForm,
         name: AppRouterName.noticeFormName,
-        pageBuilder: (context, state) {
-          // 작성 모드
-          return _buildSlidePage(context, state, const NoticeFormPage());
-        },
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) => _buildSlidePage(context, state, const NoticeFormPage()),
       ),
       GoRoute(
         path: AppRouterPath.noticeEdit,
         name: AppRouterName.noticeEditName,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          // 수정 모드
           return _buildSlidePage(context, state, NoticeFormPage(noticeId: id));
         },
       ),
       GoRoute(
         path: AppRouterPath.noticeDetail,
         name: AppRouterName.noticeDetailName,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return _buildSlidePage(context, state, NoticeDetailPage(noticeId: id));
         },
+      ),
+      GoRoute(
+        path: AppRouterPath.albumDetail,
+        name: AppRouterName.albumDetailName,
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extra = state.extra;
+          if (extra is AlbumItemModel) {
+            return _buildSlidePage(context, state, AlbumDetailPage(album: extra));
+          }
+          return _buildSlidePage(
+            context,
+            state,
+            Scaffold(
+              appBar: AppBar(title: const Text('앨범 상세')),
+              body: Center(child: Text('id: $id')),
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRouterPath.workDiaryDetail,
+        name: AppRouterName.workDiaryDetailName,
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extra = state.extra;
+          if (extra is WorkDiaryItemModel) {
+            return _buildSlidePage(context, state, WorkDiaryDetailPage(item: extra));
+          }
+          return _buildSlidePage(
+            context,
+            state,
+            Scaffold(
+              appBar: AppBar(title: const Text('업무일지 상세')),
+              body: Center(child: Text('id: $id')),
+            ),
+          );
+        },
+      ),
+      StatefulShellRoute.indexedStack(
+        pageBuilder: (context, state, navigationShell) {
+          return _buildFadePage(
+            context,
+            state,
+            MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => HomeBloc(homeRepository: context.read<HomeRepository>()),
+                ),
+                BlocProvider(
+                  create: (context) => AlbumBloc(albumRepository: context.read<AlbumRepository>()),
+                ),
+              ],
+              child: MainPage(navigationShell: navigationShell),
+            ),
+            isFadeIn: true,
+          );
+        },
+        branches: [
+          // 홈 브랜치 (공지사항 등도 이 브랜치에 넣으면 바텀탭 유지됨)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouterPath.home,
+                name: AppRouterName.homeName,
+                pageBuilder: (context, state) =>
+                    _buildFadePage(context, state, const HomeTabPage()),
+              ),
+            ],
+          ),
+
+          // 앨범 브랜치
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouterPath.album,
+                name: AppRouterName.albumName,
+                pageBuilder: (context, state) =>
+                    _buildFadePage(context, state, const AlbumTabPage()),
+              ),
+            ],
+          ),
+
+          // 업무일지 브랜치
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouterPath.workDiary,
+                name: AppRouterName.workDiaryName,
+                pageBuilder: (context, state) =>
+                    _buildFadePage(context, state, const WorkDiaryTabPage()),
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );
