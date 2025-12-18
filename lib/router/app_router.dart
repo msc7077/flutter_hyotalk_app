@@ -1,12 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/core/widget/dialog/app_common_dialog.dart';
 import 'package:flutter_hyotalk_app/features/album/data/models/album_item_model.dart';
-import 'package:flutter_hyotalk_app/features/album/data/repositories/album_repository.dart';
-import 'package:flutter_hyotalk_app/features/album/presentation/bloc/album_bloc.dart';
 import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_detail_page.dart';
 import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/find_id_page.dart';
@@ -16,10 +13,9 @@ import 'package:flutter_hyotalk_app/features/auth/presentation/pages/reset_passw
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/self_certification_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/self_certification_webview.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/splash_page.dart';
-import 'package:flutter_hyotalk_app/features/home/data/repositories/home_repository.dart';
-import 'package:flutter_hyotalk_app/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_hyotalk_app/features/home/presentation/pages/home_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/main/presentation/pages/main_page.dart';
+import 'package:flutter_hyotalk_app/features/main/presentation/scope/main_scope.dart';
 import 'package:flutter_hyotalk_app/features/more/presentation/pages/more_tab_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_detail_page.dart';
 import 'package:flutter_hyotalk_app/features/notice/presentation/page/notice_form_page.dart';
@@ -35,10 +31,8 @@ import 'package:go_router/go_router.dart';
 ///
 class AppRouter {
   AppRouter();
-
   // 2depth(전체화면) 라우트를 올릴 root navigator
   static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
-
   late final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRouterPath.splash,
@@ -133,7 +127,6 @@ class AppRouter {
           return _buildSlidePage(context, state, ResetPasswordPage(ci: ci, cd: cd));
         },
       ),
-
       // ===== 2depth 이상은 전체 페이지(root navigator)로 띄움 (바텀탭 숨김) =====
       GoRoute(
         path: AppRouterPath.more,
@@ -216,17 +209,7 @@ class AppRouter {
           return _buildFadePage(
             context,
             state,
-            MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => HomeBloc(homeRepository: context.read<HomeRepository>()),
-                ),
-                BlocProvider(
-                  create: (context) => AlbumBloc(albumRepository: context.read<AlbumRepository>()),
-                ),
-              ],
-              child: MainPage(navigationShell: navigationShell),
-            ),
+            MainScope(child: MainPage(navigationShell: navigationShell)),
             isFadeIn: true,
           );
         },
@@ -242,7 +225,6 @@ class AppRouter {
               ),
             ],
           ),
-
           // 앨범 브랜치
           StatefulShellBranch(
             routes: [
@@ -254,7 +236,6 @@ class AppRouter {
               ),
             ],
           ),
-
           // 업무일지 브랜치
           StatefulShellBranch(
             routes: [

@@ -11,9 +11,6 @@ import 'package:flutter_hyotalk_app/core/theme/app_theme.dart';
 import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
-import 'package:flutter_hyotalk_app/features/work_diary/data/repositories/work_diary_repository.dart';
-import 'package:flutter_hyotalk_app/features/work_diary/presentation/bloc/work_diary_bloc.dart';
-import 'package:flutter_hyotalk_app/features/work_diary/presentation/bloc/work_diary_event.dart';
 import 'package:flutter_hyotalk_app/router/app_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -33,26 +30,13 @@ void main() async {
   }
 
   runApp(
-    // 이 Repository들은 앱이 살아있는 동안 계속 재사용된다
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (_) => AuthRepository(authDio: AppInitializer.instance.authDio)),
-        RepositoryProvider(
-          create: (_) => WorkDiaryRepository(hyotalkDio: AppInitializer.instance.hyotalkDio),
-        ),
       ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) =>
-                AuthBloc(context.read<AuthRepository>())..add(AutoLoginCheckRequested()),
-          ),
-          BlocProvider(
-            create: (context) =>
-                WorkDiaryBloc(context.read<WorkDiaryRepository>())
-                  ..add(const WorkDiaryListRequested()),
-          ),
-        ],
+      child: BlocProvider(
+        create: (context) =>
+            AuthBloc(context.read<AuthRepository>())..add(AutoLoginCheckRequested()),
         child: const HyotalkApp(),
       ),
     ),
