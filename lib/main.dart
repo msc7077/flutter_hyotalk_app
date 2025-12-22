@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,7 +54,12 @@ class HyotalkApp extends StatefulWidget {
 }
 
 class _HyotalkAppState extends State<HyotalkApp> {
+  // 라우터 초기화
   late AppRouter _appRouter = AppRouter();
+
+  // 딥링크 초기화
+  final _appLinks = AppLinks();
+  StreamSubscription<Uri>? _sub;
 
   @override
   void initState() {
@@ -62,6 +70,26 @@ class _HyotalkAppState extends State<HyotalkApp> {
     // GoRouter가 Hot Reload 때마다 새로 생성되기 때문에 코드 수정을 저장할때마다 앱이 재실행되버린다.
     // 그래서 HyotalkApp StatefulWidget로 바꾸고 GoRouter를 initState에서 딱 1번만 생성하도록 수정했다.
     _appRouter = AppRouter();
+
+    // 1) cold start (앱 완전 종료 상태에서 들어온 링크)
+    _appLinks.getInitialLink().then((uri) {
+      AppLoggerService.i('getInitialLink > uri: $uri');
+      if (uri == null) return;
+      // TODO: uri를 location으로 변환해서 저장/이동
+      // ex) PendingDeepLinkStore.set(normalize(uri));
+    });
+
+    // 2) warm start (실행 중/백그라운드에서 들어온 링크)
+    _sub = _appLinks.uriLinkStream.listen((uri) {
+      AppLoggerService.i('uriLinkStream >uri: $uri');
+      // TODO: uri를 location으로 변환해서 저장/이동
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   @override

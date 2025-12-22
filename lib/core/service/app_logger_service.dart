@@ -22,21 +22,21 @@ class AppLoggerService {
 
   /// info 로그
   static void i(String message) {
-    if (kDebugMode) {
+    if (kDebugMode || kProfileMode) {
       print('✅ [$tag][INFO] (${_caller()}) $message');
     }
   }
 
   /// warning 로그
   static void w(String message) {
-    if (kDebugMode) {
+    if (kDebugMode || kProfileMode) {
       print('⚠️ [$tag][WARN] (${_caller()}) $message');
     }
   }
 
   /// error 로그
   static void e(String message) {
-    if (kDebugMode) {
+    if (kDebugMode || kProfileMode) {
       print('❌ [$tag][ERROR] (${_caller()}) $message');
     }
   }

@@ -29,9 +29,10 @@ import 'package:go_router/go_router.dart';
 
 /// AppRouter 앱의 라우팅 관리를 담당
 ///
+/// GlobalKey 를 통해 2depth 이상은 바텀탭 바를 숨기고 전체화면으로 띄우도록 설정했다.
+///
 class AppRouter {
   AppRouter();
-  // 2depth(전체화면) 라우트를 올릴 root navigator
   static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
   late final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -127,6 +128,50 @@ class AppRouter {
           return _buildSlidePage(context, state, ResetPasswordPage(ci: ci, cd: cd));
         },
       ),
+      StatefulShellRoute.indexedStack(
+        pageBuilder: (context, state, navigationShell) {
+          return _buildFadePage(
+            context,
+            state,
+            MainScope(child: MainPage(navigationShell: navigationShell)),
+            isFadeIn: true,
+          );
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouterPath.home,
+                name: AppRouterName.homeName,
+                pageBuilder: (context, state) =>
+                    _buildFadePage(context, state, const HomeTabPage()),
+              ),
+            ],
+          ),
+          // 앨범 브랜치
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouterPath.album,
+                name: AppRouterName.albumName,
+                pageBuilder: (context, state) =>
+                    _buildFadePage(context, state, const AlbumTabPage()),
+              ),
+            ],
+          ),
+          // 업무일지 브랜치
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRouterPath.workDiary,
+                name: AppRouterName.workDiaryName,
+                pageBuilder: (context, state) =>
+                    _buildFadePage(context, state, const WorkDiaryTabPage()),
+              ),
+            ],
+          ),
+        ],
+      ),
       // ===== 2depth 이상은 전체 페이지(root navigator)로 띄움 (바텀탭 숨김) =====
       GoRoute(
         path: AppRouterPath.more,
@@ -203,51 +248,6 @@ class AppRouter {
             ),
           );
         },
-      ),
-      StatefulShellRoute.indexedStack(
-        pageBuilder: (context, state, navigationShell) {
-          return _buildFadePage(
-            context,
-            state,
-            MainScope(child: MainPage(navigationShell: navigationShell)),
-            isFadeIn: true,
-          );
-        },
-        branches: [
-          // 홈 브랜치 (공지사항 등도 이 브랜치에 넣으면 바텀탭 유지됨)
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRouterPath.home,
-                name: AppRouterName.homeName,
-                pageBuilder: (context, state) =>
-                    _buildFadePage(context, state, const HomeTabPage()),
-              ),
-            ],
-          ),
-          // 앨범 브랜치
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRouterPath.album,
-                name: AppRouterName.albumName,
-                pageBuilder: (context, state) =>
-                    _buildFadePage(context, state, const AlbumTabPage()),
-              ),
-            ],
-          ),
-          // 업무일지 브랜치
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRouterPath.workDiary,
-                name: AppRouterName.workDiaryName,
-                pageBuilder: (context, state) =>
-                    _buildFadePage(context, state, const WorkDiaryTabPage()),
-              ),
-            ],
-          ),
-        ],
       ),
     ],
   );

@@ -1,4 +1,4 @@
-package com.example.flutter_hyotalk_app
+package net.silveredu.hyotalk
 
 import io.flutter.embedding.android.FlutterActivity
 
