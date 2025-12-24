@@ -20,6 +20,8 @@ class AppRouterPath {
   static const String resetPassword = '/reset-password';
   // 로그인 페이지
   static const String login = '/login';
+  // 간편회원가입 페이지
+  static const String simpleRegister = '/simple-register';
   // 메인 - 홈 페이지
   static const String home = '/home';
   // 메인 - 앨범 페이지

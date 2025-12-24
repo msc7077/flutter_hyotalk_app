@@ -35,30 +35,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AutoLoginCheckRequested event,
     Emitter<AuthState> emit,
   ) async {
-    // 현재 State 확인
-    final currentState = state;
-
-    // 이미 AuthAuthenticated 상태이면 재사용
-    if (currentState is AuthAuthenticated) {
-      // 저장된 토큰과 현재 State의 토큰 비교
-      final storedToken = await AppSecureStorage.getString(AppSecureStorageKey.token);
-      final isAutoLogin = AppPreferenceStorage.getBool(AppPreferenceStorageKey.isAutoLogin);
-
-      // 토큰이 같고 자동 로그인이 활성화되어 있다면 재사용 (API 호출 없이 즉시 반환)
-      if (isAutoLogin &&
-          storedToken != null &&
-          storedToken.isNotEmpty &&
-          storedToken == currentState.token) {
-        // 이미 로그인된 상태이므로 그대로 유지 (불필요한 API 호출 방지)
-        return;
-      }
-    }
-
-    // AuthLoading 상태이면 중복 처리 방지
-    if (currentState is AuthLoading) {
-      return;
-    }
-
     emit(AuthLoading());
 
     // 토큰 조회

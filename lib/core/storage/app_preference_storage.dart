@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 내부 설정 저장소(SharedPreferences) 키 정의
 class AppPreferenceStorageKey {
   static const String isAutoLogin = 'auto_login';
+  static const String pendingDeepLinkLocation = 'pending_deep_link_location';
 }
 
 /// 내부 설정 저장소(SharedPreferences)

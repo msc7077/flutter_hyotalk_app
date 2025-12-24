@@ -21,6 +21,8 @@ class AppRouterName {
   static const String resetPasswordName = 'reset-password';
   // 로그인 페이지
   static const String loginName = 'login';
+  // 간편회원가입 페이지
+  static const String simpleRegisterName = 'simple-register';
   // 메인 - 홈 페이지
   static const String homeName = 'home';
   // 메인 - 앨범 페이지

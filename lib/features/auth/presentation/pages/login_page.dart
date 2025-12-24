@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/extensions/context_media_query_extension.dart';
+import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_dimensions.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
@@ -27,6 +28,24 @@ class _LoginPageState extends State<LoginPage> {
   final _idTextEditingController = TextEditingController();
   final _passwordTextEditingController = TextEditingController();
 
+  void _goHomeThenPush(String location) {
+    // 탭 루트면 그대로 go
+    if (location == AppRouterPath.home ||
+        location == AppRouterPath.album ||
+        location == AppRouterPath.workDiary) {
+      context.go(location);
+      return;
+    }
+
+    // 상세/초대 같은 2depth는 홈을 깔고 push로 올려서 back stack 보장
+    final router = GoRouter.of(context);
+    router.go(AppRouterPath.home);
+    Future.microtask(() {
+      if (!mounted) return;
+      router.push(location);
+    });
+  }
+
   @override
   void dispose() {
     _idTextEditingController.dispose();
@@ -39,8 +58,16 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          // 로그인 성공 시 홈으로 이동
-          context.go(AppRouterPath.home);
+          // 로그인 성공 시 pending 딥링크가 있으면 그쪽으로 이동
+          final pending = AppPreferenceStorage.getString(
+            AppPreferenceStorageKey.pendingDeepLinkLocation,
+          );
+          if (!mounted) return;
+          if (pending.isNotEmpty) {
+            _goHomeThenPush(pending);
+          } else {
+            context.go(AppRouterPath.home);
+          }
         } else if (state is AuthFailure) {
           AppCommonDialog.show(context, state.message, title: AppTexts.loginFailed);
         }

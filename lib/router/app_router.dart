@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_texts.dart';
 import 'package:flutter_hyotalk_app/core/widget/dialog/app_common_dialog.dart';
 import 'package:flutter_hyotalk_app/features/album/data/models/album_item_model.dart';
 import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_detail_page.dart';
 import 'package:flutter_hyotalk_app/features/album/presentation/pages/album_tab_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/find_id_page.dart';
+import 'package:flutter_hyotalk_app/features/auth/presentation/pages/invite_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/register_page.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/pages/reset_password_page.dart';
@@ -37,7 +42,23 @@ class AppRouter {
   late final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRouterPath.splash,
+    redirect: (context, state) {
+      final path = state.uri.path;
+      if (path.length > 1 && path.endsWith('/')) {
+        final normalizedPath = path.substring(0, path.length - 1);
+        return Uri(
+          path: normalizedPath,
+          queryParameters: state.uri.queryParameters.isEmpty ? null : state.uri.queryParameters,
+          fragment: state.uri.fragment.isEmpty ? null : state.uri.fragment,
+        ).toString();
+      }
+      return null;
+    },
     errorBuilder: (context, state) {
+      AppLoggerService.e(
+        'GoRouter errorBuilder > uri=${state.uri}, matchedLocation=${state.matchedLocation}, fullPath=${state.fullPath}',
+      );
+      final authState = context.read<AuthBloc>().state;
       return Scaffold(
         body: Builder(
           builder: (dialogContext) {
@@ -48,14 +69,14 @@ class AppRouter {
                   AppTexts.pageNotFound,
                   title: AppTexts.error,
                   onConfirm: () {
-                    context.go(AppRouterPath.home);
+                    // 인증 상태에 따라 이동 목적지를 분기 (무조건 홈으로 보내지 않음)
+                    if (authState is AuthAuthenticated) {
+                      context.go(AppRouterPath.home);
+                    } else {
+                      context.go(AppRouterPath.splash);
+                    }
                   },
                 );
-                Future.delayed(const Duration(seconds: 1), () {
-                  if (dialogContext.mounted && context.mounted) {
-                    context.go(AppRouterPath.home);
-                  }
-                });
               }
             });
             return const SizedBox.shrink();
@@ -69,6 +90,14 @@ class AppRouter {
         name: AppRouterName.splashName,
         pageBuilder: (context, state) =>
             _buildFadePage(context, state, const SplashPage(), isFadeOut: true),
+      ),
+      GoRoute(
+        path: AppRouterPath.simpleRegister,
+        name: AppRouterName.simpleRegisterName,
+        pageBuilder: (context, state) {
+          final inviteId = state.uri.queryParameters['id'] ?? '';
+          return _buildSlidePage(context, state, InvitePage(inviteId: inviteId));
+        },
       ),
       GoRoute(
         path: AppRouterPath.login,
