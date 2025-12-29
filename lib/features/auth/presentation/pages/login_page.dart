@@ -58,13 +58,17 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          // 로그인 성공 시 pending 딥링크가 있으면 그쪽으로 이동
+          // 로그인 상태이고 pending 딥링크가 있으면 그쪽으로 이동
           final pending = AppPreferenceStorage.getString(
             AppPreferenceStorageKey.pendingDeepLinkLocation,
           );
           if (!mounted) return;
           if (pending.isNotEmpty) {
-            _goHomeThenPush(pending);
+            Future.microtask(() async {
+              await AppPreferenceStorage.remove(AppPreferenceStorageKey.pendingDeepLinkLocation);
+              if (!mounted) return;
+              _goHomeThenPush(pending);
+            });
           } else {
             context.go(AppRouterPath.home);
           }

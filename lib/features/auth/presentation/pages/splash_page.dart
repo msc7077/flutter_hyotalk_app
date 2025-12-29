@@ -73,49 +73,49 @@ class _SplashPageState extends State<SplashPage> {
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    String? pending;
-    try {
-      pending = AppPreferenceStorage.getString(AppPreferenceStorageKey.pendingDeepLinkLocation);
-    } catch (_) {
-      pending = null;
-    }
+    final pending = AppPreferenceStorage.getString(AppPreferenceStorageKey.pendingDeepLinkLocation);
     if (!mounted) return;
 
-    if (pending != null) {
-      // 미로그인 + 초대 링크는 splash -> simpleRegister, back -> login
-      // login을 밑에 깔고 simpleRegister를 push로 올린다.
-      if (pending.startsWith('/invitemsg') &&
-          (state is AuthUnauthenticated || state is AuthFailure)) {
-        _goLoginThenPush(pending);
-        return;
-      }
+    // pending 딥링크가 있으면 처리 후 이동
+    if (pending.isNotEmpty) {
+      // 초대/간편회원가입은 "1회성"으로 소비(뒤로가기/재진입 시 반복 이동 방지)
+      if (pending.startsWith(AppRouterPath.simpleRegister) || pending.startsWith('/invitemsg')) {
+        await AppPreferenceStorage.remove(AppPreferenceStorageKey.pendingDeepLinkLocation);
+        if (!mounted) return;
 
-      // 그 외 공개 딥링크는 그대로 진입
-      if (pending.startsWith('/invitemsg') && state is AuthAuthenticated) {
+        // 미로그인일때 초대 링크는 splash -> simpleRegister, back -> login
+        // login을 밑에 깔고 simpleRegister를 push로 올린다.
+        if (state is AuthUnauthenticated || state is AuthFailure) {
+          _goLoginThenPush(pending);
+          return;
+        }
+
+        // 로그인 상태면 홈을 깔고 push로 올려서 back stack 보장
         _goHomeThenPush(pending);
         return;
       }
 
-      context.go(pending);
+      // 로그인 상태면 소비 후 이동, 미로그인이면 pending 유지 후 로그인으로
+      if (state is AuthAuthenticated) {
+        await AppPreferenceStorage.remove(AppPreferenceStorageKey.pendingDeepLinkLocation);
+        if (!mounted) return;
+        _goHomeThenPush(pending);
+        return;
+      }
+
+      // 미로그인 상태면 pending 그대로 두고 로그인으로
+      context.go(AppRouterPath.login);
       return;
     }
 
+    // 로그인 상태면 홈으로 이동
     if (state is AuthAuthenticated) {
-      if (pending != null && pending.isNotEmpty) {
-        _goHomeThenPush(pending);
-      } else {
-        context.go(AppRouterPath.home);
-      }
+      context.go(AppRouterPath.home);
       return;
     }
 
+    // 미로그인 상태면 로그인 페이지로 이동
     if (state is AuthUnauthenticated || state is AuthFailure) {
-      if (pending != null && pending.isNotEmpty) {
-        await AppPreferenceStorage.setString(
-          AppPreferenceStorageKey.pendingDeepLinkLocation,
-          pending,
-        );
-      }
       if (!mounted) return;
       context.go(AppRouterPath.login);
     }

@@ -29,7 +29,13 @@ class DeepLinkNormalizer {
 
     // 2) universal/app links: https://hyotalk.silveredu.net/invite?... -> /invite?...
     if (uri.scheme == 'http' || uri.scheme == 'https') {
-      final path = uri.path.isEmpty ? '/' : uri.path;
+      var path = uri.path.isEmpty ? '/' : uri.path;
+
+      // 웹 초대 링크 호환: /invitemsg, /invite -> 앱 내부 라우트(/simple-register)로 매핑
+      if (path == '/invitemsg' || path == '/invite') {
+        path = AppRouterPath.simpleRegister;
+      }
+
       return Uri(
         path: path,
         queryParameters: uri.queryParameters.isEmpty ? null : uri.queryParameters,
