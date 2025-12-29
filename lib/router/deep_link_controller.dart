@@ -26,6 +26,7 @@ class DeepLinkController {
     // cold start (앱 완전 종료 상태에서 들어온 링크)
     final initial = await _appLinks.getInitialLink();
     AppLoggerService.i('getInitialLink > uri: $initial');
+    // initial 이 있을때만 딥링크 처리함
     if (initial != null) {
       await _handle(initial, isColdStart: true, authState: getAuthState());
     }
@@ -89,7 +90,7 @@ class DeepLinkController {
       return;
     }
 
-    // 미로그인 상태
+    // 미로그인 상태에 초대 링크가 있으면 로그인으로 보내고, 로그인 성공 후 pending 처리
     if (isInvite) {
       // 초대는 warm start에서 pending 저장 없이 즉시 스택 구성
       AppPreferenceStorage.remove(AppPreferenceStorageKey.pendingDeepLinkLocation);
