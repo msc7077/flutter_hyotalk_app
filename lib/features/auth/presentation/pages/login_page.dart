@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/extensions/context_media_query_extension.dart';
+import 'package:flutter_hyotalk_app/core/navigation/nav_stack_helper.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_dimensions.dart';
@@ -28,24 +29,6 @@ class _LoginPageState extends State<LoginPage> {
   final _idTextEditingController = TextEditingController();
   final _passwordTextEditingController = TextEditingController();
 
-  void _goHomeThenPush(String location) {
-    // 탭 루트면 그대로 go
-    if (location == AppRouterPath.home ||
-        location == AppRouterPath.album ||
-        location == AppRouterPath.workDiary) {
-      context.go(location);
-      return;
-    }
-
-    // 상세/초대 같은 2depth는 홈을 깔고 push로 올려서 back stack 보장
-    final router = GoRouter.of(context);
-    router.go(AppRouterPath.home);
-    Future.microtask(() {
-      if (!mounted) return;
-      router.push(location);
-    });
-  }
-
   @override
   void dispose() {
     _idTextEditingController.dispose();
@@ -67,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
             Future.microtask(() async {
               await AppPreferenceStorage.remove(AppPreferenceStorageKey.pendingDeepLinkLocation);
               if (!mounted) return;
-              _goHomeThenPush(pending);
+              NavStackHelper.goBaseThenPush(context, pending);
             });
           } else {
             context.go(AppRouterPath.home);

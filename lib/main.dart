@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hyotalk_app/core/config/env_config.dart';
 import 'package:flutter_hyotalk_app/core/init/app_initializer.dart';
+import 'package:flutter_hyotalk_app/core/navigation/deep_link_controller.dart';
 import 'package:flutter_hyotalk_app/core/service/app_bloc_observer_service.dart';
 import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
@@ -13,7 +14,6 @@ import 'package:flutter_hyotalk_app/features/auth/data/repositories/auth_reposit
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_hyotalk_app/router/app_router.dart';
-import 'package:flutter_hyotalk_app/router/deep_link_controller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {

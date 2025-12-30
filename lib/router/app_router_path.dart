@@ -20,8 +20,8 @@ class AppRouterPath {
   static const String resetPassword = '/reset-password';
   // 로그인 페이지
   static const String login = '/login';
-  // 간편회원가입 페이지
-  static const String simpleRegister = '/simple-register';
+  // 초대링크로 진입한 회원가입 페이지
+  static const String inviteRegister = '/invite-register';
   // 메인 - 홈 페이지
   static const String home = '/home';
   // 메인 - 앨범 페이지
@@ -35,7 +35,7 @@ class AppRouterPath {
   // 메인 - 더보기 페이지
   static const String more = '/more';
   // 공지사항 - 리스트 페이지
-  static const String noticeList = '/notice-list';
+  static const String notice = '/notice';
   // 공지사항 - 상세 페이지
   static const String noticeDetail = '/notice/:id';
   // 공지사항 - 작성 페이지

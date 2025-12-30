@@ -92,8 +92,8 @@ class AppRouter {
             _buildFadePage(context, state, const SplashPage(), isFadeOut: true),
       ),
       GoRoute(
-        path: AppRouterPath.simpleRegister,
-        name: AppRouterName.simpleRegisterName,
+        path: AppRouterPath.inviteRegister,
+        name: AppRouterName.inviteRegisterName,
         pageBuilder: (context, state) {
           final inviteId = state.uri.queryParameters['id'] ?? '';
           return _buildSlidePage(context, state, InvitePage(inviteId: inviteId));
@@ -209,8 +209,8 @@ class AppRouter {
         pageBuilder: (context, state) => _buildSlidePage(context, state, const MoreTabPage()),
       ),
       GoRoute(
-        path: AppRouterPath.noticeList,
-        name: AppRouterName.noticeListName,
+        path: AppRouterPath.notice,
+        name: AppRouterName.noticeName,
         parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _buildSlidePage(context, state, const NoticeListPage()),
       ),

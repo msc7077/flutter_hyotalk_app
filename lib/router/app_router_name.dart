@@ -21,8 +21,8 @@ class AppRouterName {
   static const String resetPasswordName = 'reset-password';
   // 로그인 페이지
   static const String loginName = 'login';
-  // 간편회원가입 페이지
-  static const String simpleRegisterName = 'simple-register';
+  // 초대링크로 진입한 회원가입 페이지
+  static const String inviteRegisterName = 'invite-register';
   // 메인 - 홈 페이지
   static const String homeName = 'home';
   // 메인 - 앨범 페이지
@@ -36,7 +36,7 @@ class AppRouterName {
   // 메인 - 더보기 페이지
   static const String moreName = 'more';
   // 공지사항 - 리스트 페이지
-  static const String noticeListName = 'notice-list';
+  static const String noticeName = 'notice';
   // 공지사항 - 상세 페이지
   static const String noticeDetailName = 'notice-detail';
   // 공지사항 - 작성 페이지

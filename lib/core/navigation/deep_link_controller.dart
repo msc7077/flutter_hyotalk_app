@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_hyotalk_app/core/navigation/deep_link_normalizer.dart';
 import 'package:flutter_hyotalk_app/core/service/app_logger_service.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
-import 'package:flutter_hyotalk_app/router/deep_link_normalizer.dart';
 import 'package:go_router/go_router.dart';
 
 class DeepLinkController {
@@ -76,7 +76,11 @@ class DeepLinkController {
         location == AppRouterPath.album ||
         location == AppRouterPath.workDiary;
 
-    final isInvite = location.startsWith(AppRouterPath.simpleRegister);
+    final isInvite = location.startsWith(AppRouterPath.inviteRegister);
+    final isAlbumDetail = location.startsWith('${AppRouterPath.album}/');
+    final isWorkDiaryDetail = location.startsWith('${AppRouterPath.workDiary}/');
+    // 공지 상세는 '/notice/:id' 형태이므로, 리스트 경로('/notice')를 prefix로 재사용한다.
+    final isNoticeDetail = location.startsWith('${AppRouterPath.notice}/');
 
     if (authState is AuthAuthenticated) {
       // warm start에서 바로 이동하는 경우, 남아있는 pending이 있으면 정리
@@ -85,7 +89,18 @@ class DeepLinkController {
       if (isTabRoot) {
         _router.go(location);
       } else {
-        _router.push(location);
+        // 요구사항: 예) /album/1 이면 앨범 탭을 먼저 선택하고 상세를 올린다.
+        if (isAlbumDetail || isWorkDiaryDetail || isNoticeDetail) {
+          final base = isAlbumDetail
+              ? AppRouterPath.album
+              : isWorkDiaryDetail
+              ? AppRouterPath.workDiary
+              : AppRouterPath.home; // 공지사항 상세는 홈 탭을 베이스로
+          _router.go(base);
+          Future.microtask(() => _router.push(location));
+        } else {
+          _router.push(location);
+        }
       }
       return;
     }

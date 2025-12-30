@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/navigation/nav_stack_helper.dart';
 import 'package:flutter_hyotalk_app/core/storage/app_preference_storage.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_assets.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
@@ -21,33 +22,6 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   bool _navigated = false;
-
-  void _goLoginThenPush(String location) {
-    final router = GoRouter.of(context);
-    router.go(AppRouterPath.login);
-    Future.microtask(() {
-      if (!mounted) return;
-      router.push(location);
-    });
-  }
-
-  void _goHomeThenPush(String location) {
-    // 탭 루트면 그대로 go
-    if (location == AppRouterPath.home ||
-        location == AppRouterPath.album ||
-        location == AppRouterPath.workDiary) {
-      context.go(location);
-      return;
-    }
-
-    // 2depth 이상의 페이지라면 홈을 깔고 push로 올려서 back stack 보장
-    final router = GoRouter.of(context);
-    router.go(AppRouterPath.home);
-    Future.microtask(() {
-      if (!mounted) return;
-      router.push(location);
-    });
-  }
 
   @override
   void initState() {
@@ -80,7 +54,7 @@ class _SplashPageState extends State<SplashPage> {
     // pending 딥링크가 있으면 처리 후 이동
     if (pending.isNotEmpty) {
       final isInvite =
-          pending.startsWith(AppRouterPath.simpleRegister) || pending.startsWith('/invitemsg');
+          pending.startsWith(AppRouterPath.inviteRegister) || pending.startsWith('/invitemsg');
 
       // 초대/간편회원가입은 "1회성"으로 소비(뒤로가기/재진입 시 반복 이동 방지)
       if (isInvite) {
@@ -90,12 +64,12 @@ class _SplashPageState extends State<SplashPage> {
         // 미로그인일때 초대 링크는 splash -> simpleRegister, back -> login
         // login을 밑에 깔고 simpleRegister를 push로 올린다.
         if (state is AuthUnauthenticated || state is AuthFailure) {
-          _goLoginThenPush(pending);
+          NavStackHelper.goLoginThenPush(context, pending);
           return;
         }
 
         // 로그인 상태면 홈을 깔고 push로 올려서 back stack 보장
-        _goHomeThenPush(pending);
+        NavStackHelper.goBaseThenPush(context, pending);
         return;
       }
 
@@ -103,7 +77,7 @@ class _SplashPageState extends State<SplashPage> {
       if (state is AuthAuthenticated) {
         await AppPreferenceStorage.remove(AppPreferenceStorageKey.pendingDeepLinkLocation);
         if (!mounted) return;
-        _goHomeThenPush(pending);
+        NavStackHelper.goBaseThenPush(context, pending);
         return;
       }
 
@@ -112,7 +86,7 @@ class _SplashPageState extends State<SplashPage> {
       return;
     }
 
-    // pending 없음
+    // 딥링크 없고 (=pending 없음) 로그인 상태면 홈으로
     if (state is AuthAuthenticated) {
       context.go(AppRouterPath.home);
       return;
