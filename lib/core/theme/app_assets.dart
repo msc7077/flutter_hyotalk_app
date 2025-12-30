@@ -9,13 +9,27 @@ class AppAssets {
   // 이미지 - 스플레시
   static const String imgSplash = '${imagesPath}splash.svg';
 
-  // 아이콘 - 메인 탭
-  static const String iconMenuHome = '${iconsPath}icon_menu_home.svg';
-  static const String iconMenuHomeOutlined = '${iconsPath}icon_menu_home_outlined.svg';
+  // 아이콘 - 하단 탭바
+  static const String iconBottomTabMenuHome = '${iconsPath}icon_bottom_tab_menu_home.svg';
+  static const String iconBottomTabMenuHomeOutlined =
+      '${iconsPath}icon_bottom_tab_menu_home_outlined.svg';
+  static const String iconBottomTabMenuAlbum = '${iconsPath}icon_bottom_tab_menu_album.svg';
+  static const String iconBottomTabMenuAlbumOutlined =
+      '${iconsPath}icon_bottom_tab_menu_album_outlined.svg';
+  static const String iconBottomTabMenuWork = '${iconsPath}icon_bottom_tab_menu_work.svg';
+  static const String iconBottomTabMenuWorkOutlined =
+      '${iconsPath}icon_bottom_tab_menu_work_outlined.svg';
+  static const String iconBottomTabMenuMore = '${iconsPath}icon_bottom_tab_menu_more.svg';
+  static const String iconBottomTabMenuMoreOutlined =
+      '${iconsPath}icon_bottom_tab_menu_more_outlined.svg';
+
+  // 아이콘 - 메뉴 아이콘
+  static const String iconMenuNotice = '${iconsPath}icon_menu_notice.svg';
+  static const String iconMenuNote = '${iconsPath}icon_menu_note.svg';
   static const String iconMenuAlbum = '${iconsPath}icon_menu_album.svg';
-  static const String iconMenuAlbumOutlined = '${iconsPath}icon_menu_album_outlined.svg';
-  static const String iconMenuWork = '${iconsPath}icon_menu_work.svg';
-  static const String iconMenuWorkOutlined = '${iconsPath}icon_menu_work_outlined.svg';
-  static const String iconMenuMore = '${iconsPath}icon_menu_more.svg';
-  static const String iconMenuMoreOutlined = '${iconsPath}icon_menu_more_outlined.svg';
+  static const String iconMenuSeniorInfo = '${iconsPath}icon_menu_senior_info.svg';
+  static const String iconMenuStaffAttendance = '${iconsPath}icon_menu_staff_attendance.svg';
+  static const String iconMenuLifeEducation = '${iconsPath}icon_menu_life_education.svg';
+  static const String iconMenuTodayVideo = '${iconsPath}icon_menu_today_video.svg';
+  static const String iconMenuApproveAndInvite = '${iconsPath}icon_menu_approve_and_invite.svg';
 }

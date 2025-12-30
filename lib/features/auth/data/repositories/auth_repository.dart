@@ -71,7 +71,7 @@ class AuthRepository {
       userGender: 'M',
       userProfileImageUrl: 'https://picsum.photos/200/300',
       agencyId: '1234567890',
-      role: UserRole.admin,
+      role: UserRole.staff_caregiver,
     );
   }
 

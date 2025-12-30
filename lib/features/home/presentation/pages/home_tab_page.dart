@@ -1,11 +1,18 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hyotalk_app/core/extensions/context_media_query_extension.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_assets.dart';
 import 'package:flutter_hyotalk_app/core/theme/app_colors.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_dimensions.dart';
+import 'package:flutter_hyotalk_app/core/theme/app_text_styles.dart';
 import 'package:flutter_hyotalk_app/features/auth/data/models/user_info_model.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 /// 홈 탭 페이지
@@ -40,178 +47,215 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     final userName = userInfo?.userName ?? (isAdmin ? '임현정' : '임현정');
 
+    final topPadding = context.safePadding.top;
+    final maxHeaderHeight = AppDimensions.spacingV120 + topPadding;
+    final minHeaderHeight = kToolbarHeight + topPadding;
+
     return Scaffold(
-      appBar: _HomeAppBar(),
       backgroundColor: AppColors.background,
-      body: ListView(
-        controller: _scrollController,
-        padding: EdgeInsets.zero,
+      body: Stack(
         children: [
-          // 상단 노란 배경 영역 + 프로필 영역
-          Container(
-            color: AppColors.primary,
-            padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isAdmin ? '$userName 관리자님 >' : '$userName 생활지원사 >',
-                  style: TextStyle(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                    color: AppColors.black,
+          // body
+          ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.only(top: maxHeaderHeight),
+            children: [
+              // 아이콘 메뉴 카드(4x2 그리드)
+              SizedBox(height: AppDimensions.spacingV12),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW16),
+                child: _MenuGridCard(
+                  items: isAdmin ? _HomeMenus.admin(context) : _HomeMenus.caregiver(context),
+                  crossAxisCount: 4,
+                ),
+              ),
+
+              // 관리자: 서비스 현황(테이블) + 버튼 2개
+              if (isAdmin) ...[
+                SizedBox(height: AppDimensions.spacingV18),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '서비스 현황 >',
+                          style: AppTextStyles.text18blackW700.copyWith(height: 1.2),
+                        ),
+                      ),
+                      Text(
+                        '2025.09.01',
+                        style: AppTextStyles.text12blackW400.copyWith(
+                          height: 1.2,
+                          color: AppColors.grey888888,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: AppDimensions.spacingV8),
+                const _ServiceTableCard(),
+                SizedBox(height: AppDimensions.spacingV12),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _HomeActionCard(
+                          icon: Icons.calendar_today,
+                          label: '일정 계획',
+                          onTap: () {},
+                        ),
+                      ),
+                      SizedBox(width: AppDimensions.spacingW12),
+                      Expanded(
+                        child: _HomeActionCard(
+                          icon: Icons.fact_check_outlined,
+                          label: '서비스결과',
+                          onTap: () {},
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-          ),
 
-          // 아이콘 메뉴 카드(4x2 그리드)
-          SizedBox(height: 12.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: _MenuGridCard(
-              items: isAdmin ? _HomeMenus.admin(context) : _HomeMenus.caregiver(context),
-              crossAxisCount: 4,
-            ),
-          ),
-
-          // 관리자: 서비스 현황(테이블) + 버튼 2개
-          if (isAdmin) ...[
-            SizedBox(height: 18.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '서비스 현황 >',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                        color: AppColors.black,
-                      ),
-                    ),
+              // 생활지원사: (요구사항에 명시되지 않아) 최소 섹션만 유지
+              if (!isAdmin) ...[
+                SizedBox(height: AppDimensions.spacingV18),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW16),
+                  child: Text(
+                    '오늘 일정 >',
+                    style: AppTextStyles.text18blackW700.copyWith(height: 1.2),
                   ),
-                  Text(
-                    '2025.09.01',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2,
-                      color: AppColors.grey888888,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 8.h),
-            const _ServiceTableCard(),
-            SizedBox(height: 12.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _HomeActionCard(
-                      icon: Icons.calendar_today,
-                      label: '일정 계획',
-                      onTap: () {},
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: _HomeActionCard(
-                      icon: Icons.fact_check_outlined,
-                      label: '서비스결과',
-                      onTap: () {},
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          // 생활지원사: (요구사항에 명시되지 않아) 최소 섹션만 유지
-          if (!isAdmin) ...[
-            SizedBox(height: 18.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                '오늘 일정 >',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                  color: AppColors.black,
                 ),
-              ),
-            ),
-            SizedBox(height: 12.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: _ScheduleCard(
-                time: '09:00',
-                typeLabel: '방문',
-                duration: '60분',
-                name: '김복녀',
-                meta: '여 / 1947-07-01 / 일반',
-                rightTop: '실적 60분',
-                actionLabel: '일지 완료',
-                actionColor: Colors.black87,
-              ),
-            ),
-          ],
+                SizedBox(height: AppDimensions.spacingV12),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW16),
+                  child: _ScheduleCard(
+                    time: '09:00',
+                    typeLabel: '방문',
+                    duration: '60분',
+                    name: '김복녀',
+                    meta: '여 / 1947-07-01 / 일반',
+                    rightTop: '실적 60분',
+                    actionLabel: '일지 완료',
+                    actionColor: Colors.black87,
+                  ),
+                ),
+              ],
 
-          // 배너
-          SizedBox(height: 16.h),
-          const _BannerPlaceholder(),
-          SizedBox(height: 24.h),
+              // 배너
+              SizedBox(height: AppDimensions.spacingV16),
+              const _BannerPlaceholder(),
+              SizedBox(height: AppDimensions.spacingV24),
+            ],
+          ),
+
+          // header (pinned + collapsible)
+          _HomeCollapsingHeader(
+            controller: _scrollController,
+            maxHeight: maxHeaderHeight,
+            minHeight: minHeaderHeight,
+            userName: userName,
+            isAdmin: isAdmin,
+            onTapNotification: () {},
+          ),
         ],
       ),
     );
   }
 }
 
-class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  @override
-  Size get preferredSize => Size.fromHeight(44.h);
+class _HomeCollapsingHeader extends AnimatedWidget {
+  const _HomeCollapsingHeader({
+    required ScrollController controller,
+    required this.maxHeight,
+    required this.minHeight,
+    required this.userName,
+    required this.isAdmin,
+    required this.onTapNotification,
+  }) : super(listenable: controller);
+
+  ScrollController get _controller => listenable as ScrollController;
+
+  final double maxHeight;
+  final double minHeight;
+  final String userName;
+  final bool isAdmin;
+  final VoidCallback onTapNotification;
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      elevation: 0,
-      centerTitle: true,
-      title: Text(
-        '함께해서 더 좋은, 효톡',
-        style: TextStyle(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w400,
-          height: 1.2,
-          color: AppColors.black,
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: EdgeInsets.only(right: 8.w),
-          child: IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notifications_none, size: 24.sp, color: AppColors.black),
+    final offset = _controller.hasClients ? _controller.offset : 0.0;
+    final collapseRange = (maxHeight - minHeight).clamp(1.0, double.infinity);
+    final t = (offset / collapseRange).clamp(0.0, 1.0);
+
+    final currentHeight = lerpDouble(maxHeight, minHeight, t)!;
+    final greetingOpacity = (1.0 - (t * 1.25)).clamp(0.0, 1.0);
+
+    return Positioned(
+      left: 0,
+      right: 0,
+      top: 0,
+      height: currentHeight,
+      child: Container(
+        color: AppColors.primary,
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: kToolbarHeight,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            '함께해서 더 좋은, 효톡',
+                            style: AppTextStyles.text14blackW400.copyWith(height: 1.2),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: onTapNotification,
+                        icon: Icon(Icons.notifications_none, size: 24.sp, color: AppColors.black),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Opacity(
+                      opacity: greetingOpacity,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: Text(
+                          isAdmin ? '$userName 관리자님 >' : '$userName 생활지원사 >',
+                          style: AppTextStyles.text22blackW700.copyWith(height: 1.2),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
 
 class _MenuItem {
-  const _MenuItem({required this.label, required this.icon, this.onTap});
+  const _MenuItem({required this.label, required this.iconAsset, this.onTap});
 
   final String label;
-  final IconData icon;
+  final String iconAsset;
   final VoidCallback? onTap;
 }
 
@@ -219,33 +263,33 @@ class _HomeMenus {
   static List<_MenuItem> caregiver(BuildContext context) => [
     _MenuItem(
       label: '공지',
-      icon: Icons.campaign_outlined,
+      iconAsset: AppAssets.iconMenuNotice,
       onTap: () => context.push(AppRouterPath.notice),
     ),
-    _MenuItem(label: '알림장', icon: Icons.menu_book_outlined, onTap: () {}),
-    _MenuItem(label: '생활교육', icon: Icons.cast_for_education_outlined, onTap: () {}),
-    _MenuItem(label: '어르신정보', icon: Icons.groups_outlined, onTap: () {}),
+    _MenuItem(label: '알림장', iconAsset: AppAssets.iconMenuNote, onTap: () {}),
+    _MenuItem(label: '생활교육', iconAsset: AppAssets.iconMenuLifeEducation, onTap: () {}),
+    _MenuItem(label: '어르신정보', iconAsset: AppAssets.iconMenuSeniorInfo, onTap: () {}),
   ];
 
   static List<_MenuItem> admin(BuildContext context) => [
     _MenuItem(
       label: '공지',
-      icon: Icons.campaign_outlined,
+      iconAsset: AppAssets.iconMenuNotice,
       onTap: () => context.push(AppRouterPath.notice),
     ),
-    _MenuItem(label: '알림장', icon: Icons.menu_book_outlined, onTap: () {}),
+    _MenuItem(label: '알림장', iconAsset: AppAssets.iconMenuNote, onTap: () {}),
     _MenuItem(
       label: '앨범',
-      icon: Icons.photo_library_outlined,
+      iconAsset: AppAssets.iconMenuAlbum,
       onTap: () => context.go(AppRouterPath.album),
     ),
-    _MenuItem(label: '어르신정보', icon: Icons.groups_outlined, onTap: () {}),
-    _MenuItem(label: '직원출근부', icon: Icons.event_note_outlined, onTap: () {}),
-    _MenuItem(label: '생활교육', icon: Icons.cast_for_education_outlined, onTap: () {}),
-    _MenuItem(label: '오늘영상', icon: Icons.ondemand_video_outlined, onTap: () {}),
+    _MenuItem(label: '어르신정보', iconAsset: AppAssets.iconMenuSeniorInfo, onTap: () {}),
+    _MenuItem(label: '직원출근부', iconAsset: AppAssets.iconMenuStaffAttendance, onTap: () {}),
+    _MenuItem(label: '생활교육', iconAsset: AppAssets.iconMenuLifeEducation, onTap: () {}),
+    _MenuItem(label: '오늘영상', iconAsset: AppAssets.iconMenuTodayVideo, onTap: () {}),
     _MenuItem(
       label: '승인/초대',
-      icon: Icons.mail_outline,
+      iconAsset: AppAssets.iconMenuApproveAndInvite,
       onTap: () => context.push(AppRouterPath.approveAndInvite),
     ),
   ];
@@ -273,27 +317,24 @@ class _MenuGridCard extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         childAspectRatio: 1.0,
-        children: items.map((e) {
+        children: items.map((item) {
           return InkWell(
-            onTap: e.onTap,
+            onTap: item.onTap,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 CircleAvatar(
                   radius: 22.r,
                   backgroundColor: AppColors.greyF5F5F5,
-                  child: Icon(e.icon, size: 22.sp, color: AppColors.grey4A4A4A),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  e.label,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
-                    height: 1.2,
-                    color: AppColors.black,
+                  child: SvgPicture.asset(
+                    item.iconAsset,
+                    width: 22.sp,
+                    height: 22.sp,
+                    colorFilter: const ColorFilter.mode(AppColors.grey4A4A4A, BlendMode.srcIn),
                   ),
                 ),
+                SizedBox(height: 8.h),
+                Text(item.label, style: AppTextStyles.text12blackW400.copyWith(height: 1.2)),
               ],
             ),
           );
@@ -318,15 +359,7 @@ class _BannerPlaceholder extends StatelessWidget {
         ),
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
-        child: Text(
-          '공동구매 배너\n자리입니다',
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w700,
-            height: 1.2,
-            color: AppColors.black,
-          ),
-        ),
+        child: Text('공동구매 배너\n자리입니다', style: AppTextStyles.text16blackW700.copyWith(height: 1.2)),
       ),
     );
   }
@@ -358,7 +391,7 @@ class _ScheduleCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         boxShadow: const [
           BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 4)),
         ],
@@ -368,85 +401,47 @@ class _ScheduleCard extends StatelessWidget {
           SizedBox(
             width: 70.w,
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 14.h),
+              padding: EdgeInsets.symmetric(vertical: AppDimensions.spacingV14),
               child: Column(
-                children: [
-                  Text(
-                    time,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                      color: AppColors.black,
-                    ),
-                  ),
-                ],
+                children: [Text(time, style: AppTextStyles.text16blackW700.copyWith(height: 1.2))],
               ),
             ),
           ),
-          VerticalDivider(width: 1.w),
+          VerticalDivider(width: AppDimensions.spacingW1),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(AppDimensions.spacingW12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.spacingW8,
+                          vertical: AppDimensions.spacingV3,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFEFF6FF),
                           borderRadius: BorderRadius.circular(999.r),
                         ),
                         child: Text(
                           typeLabel,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
-                            height: 1.2,
-                            color: AppColors.black,
-                          ),
+                          style: AppTextStyles.text12blackW400.copyWith(height: 1.2),
                         ),
                       ),
                       SizedBox(width: 8.w),
-                      Text(
-                        duration,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w400,
-                          height: 1.2,
-                          color: AppColors.black,
-                        ),
-                      ),
+                      Text(duration, style: AppTextStyles.text13blackW400.copyWith(height: 1.2)),
                       const Spacer(),
-                      Text(
-                        rightTop,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400,
-                          height: 1.2,
-                          color: AppColors.black,
-                        ),
-                      ),
+                      Text(rightTop, style: AppTextStyles.text12blackW400.copyWith(height: 1.2)),
                     ],
                   ),
                   SizedBox(height: 8.h),
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                      color: AppColors.black,
-                    ),
-                  ),
+                  Text(name, style: AppTextStyles.text16blackW700.copyWith(height: 1.2)),
                   SizedBox(height: 2.h),
                   Text(
                     meta,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
+                    style: AppTextStyles.text12blackW400.copyWith(
                       height: 1.2,
                       color: AppColors.grey888888,
                     ),
@@ -465,12 +460,7 @@ class _ScheduleCard extends StatelessWidget {
               ),
               child: Text(
                 actionLabel,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
-                  height: 1.2,
-                  color: Colors.white,
-                ),
+                style: AppTextStyles.text12blackW400.copyWith(height: 1.2, color: Colors.white),
               ),
             ),
           ),
@@ -485,18 +475,11 @@ class _ServiceTableCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerStyle = TextStyle(
-      fontSize: 12.sp,
-      fontWeight: FontWeight.w400,
+    final headerStyle = AppTextStyles.text12blackW400.copyWith(
       height: 1.2,
       color: AppColors.grey4A4A4A,
     );
-    final cellStyle = TextStyle(
-      fontSize: 12.sp,
-      fontWeight: FontWeight.w400,
-      height: 1.2,
-      color: AppColors.black,
-    );
+    final cellStyle = AppTextStyles.text12blackW400.copyWith(height: 1.2);
 
     TableRow row(List<Widget> cells) => TableRow(children: cells);
 
@@ -599,15 +582,7 @@ class _HomeActionCard extends StatelessWidget {
           children: [
             Icon(icon, color: AppColors.orangeEB5E2B, size: 22.sp),
             SizedBox(height: 8.h),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-                height: 1.2,
-                color: AppColors.black,
-              ),
-            ),
+            Text(label, style: AppTextStyles.text12blackW400.copyWith(height: 1.2)),
           ],
         ),
       ),

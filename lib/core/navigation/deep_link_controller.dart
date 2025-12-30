@@ -77,9 +77,11 @@ class DeepLinkController {
         location == AppRouterPath.workDiary;
 
     final isInvite = location.startsWith(AppRouterPath.inviteRegister);
+    // 앨범과 업무일지는 탭 내부 2depth 화면이므로, 탭을 먼저 선택하고 상세를 올린다.
     final isAlbumDetail = location.startsWith('${AppRouterPath.album}/');
     final isWorkDiaryDetail = location.startsWith('${AppRouterPath.workDiary}/');
-    // 공지 상세는 '/notice/:id' 형태이므로, 리스트 경로('/notice')를 prefix로 재사용한다.
+    // 앨범과 업무일지 탭이 아닌 2depth 화면은 홈 탭을 베이스로 한다.
+    // TODO : 공지사항처럼 탭 외에 2depth 화면이 있는 경우가 필요한 경우에는 추가한다.
     final isNoticeDetail = location.startsWith('${AppRouterPath.notice}/');
 
     if (authState is AuthAuthenticated) {

@@ -38,6 +38,12 @@ class AppTextStyles {
     color: AppColors.black,
     fontFamily: fontFamily,
   );
+  static TextStyle get text14blackW400 => TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+    fontFamily: fontFamily,
+  );
   static TextStyle get text16blackW400 => TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,
@@ -52,6 +58,12 @@ class AppTextStyles {
   );
   static TextStyle get text18blackW700 => TextStyle(
     fontSize: 18.sp,
+    fontWeight: FontWeight.w700,
+    color: AppColors.black,
+    fontFamily: fontFamily,
+  );
+  static TextStyle get text22blackW700 => TextStyle(
+    fontSize: 22.sp,
     fontWeight: FontWeight.w700,
     color: AppColors.black,
     fontFamily: fontFamily,

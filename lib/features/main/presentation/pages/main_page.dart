@@ -29,23 +29,23 @@ class _MainPageState extends State<MainPage> {
   /// 하단 탭바 아이콘과 라벨 정의
   final List<NavigationDestination> _destinations = [
     NavigationDestination(
-      icon: SvgPicture.asset(AppAssets.iconMenuHomeOutlined),
-      selectedIcon: SvgPicture.asset(AppAssets.iconMenuHome),
+      icon: SvgPicture.asset(AppAssets.iconBottomTabMenuHomeOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconBottomTabMenuHome),
       label: AppTexts.home,
     ),
     NavigationDestination(
-      icon: SvgPicture.asset(AppAssets.iconMenuAlbumOutlined),
-      selectedIcon: SvgPicture.asset(AppAssets.iconMenuAlbum),
+      icon: SvgPicture.asset(AppAssets.iconBottomTabMenuAlbumOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconBottomTabMenuAlbum),
       label: AppTexts.album,
     ),
     NavigationDestination(
-      icon: SvgPicture.asset(AppAssets.iconMenuWorkOutlined),
-      selectedIcon: SvgPicture.asset(AppAssets.iconMenuWork),
+      icon: SvgPicture.asset(AppAssets.iconBottomTabMenuWorkOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconBottomTabMenuWork),
       label: AppTexts.workDiary,
     ),
     NavigationDestination(
-      icon: SvgPicture.asset(AppAssets.iconMenuMoreOutlined),
-      selectedIcon: SvgPicture.asset(AppAssets.iconMenuMore),
+      icon: SvgPicture.asset(AppAssets.iconBottomTabMenuMoreOutlined),
+      selectedIcon: SvgPicture.asset(AppAssets.iconBottomTabMenuMore),
       label: AppTexts.more,
     ),
   ];
