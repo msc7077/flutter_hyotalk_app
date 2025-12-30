@@ -60,27 +60,29 @@ class AppRouter {
       );
       final authState = context.read<AuthBloc>().state;
       return Scaffold(
-        body: Builder(
-          builder: (dialogContext) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (dialogContext.mounted) {
-                AppCommonDialog.show(
-                  dialogContext,
-                  AppTexts.pageNotFound,
-                  title: AppTexts.error,
-                  onConfirm: () {
-                    // 인증 상태에 따라 이동 목적지를 분기 (무조건 홈으로 보내지 않음)
-                    if (authState is AuthAuthenticated) {
-                      context.go(AppRouterPath.home);
-                    } else {
-                      context.go(AppRouterPath.splash);
-                    }
-                  },
-                );
-              }
-            });
-            return const SizedBox.shrink();
-          },
+        body: SafeArea(
+          child: Builder(
+            builder: (dialogContext) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (dialogContext.mounted) {
+                  AppCommonDialog.show(
+                    dialogContext,
+                    AppTexts.pageNotFound,
+                    title: AppTexts.error,
+                    onConfirm: () {
+                      // 인증 상태에 따라 이동 목적지를 분기 (무조건 홈으로 보내지 않음)
+                      if (authState is AuthAuthenticated) {
+                        context.go(AppRouterPath.home);
+                      } else {
+                        context.go(AppRouterPath.splash);
+                      }
+                    },
+                  );
+                }
+              });
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       );
     },

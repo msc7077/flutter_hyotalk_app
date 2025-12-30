@@ -100,8 +100,10 @@ class _SplashPageState extends State<SplashPage> {
       listenWhen: (previous, current) => current is! AuthInitial && current is! AuthLoading,
       listener: (context, state) => _handleAuthState(state),
       child: Scaffold(
-        body: Center(
-          child: Transform.scale(scale: 0.7, child: SvgPicture.asset(AppAssets.imgSplash)),
+        body: SafeArea(
+          child: Center(
+            child: Transform.scale(scale: 0.7, child: SvgPicture.asset(AppAssets.imgSplash)),
+          ),
         ),
       ),
     );

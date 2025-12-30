@@ -87,16 +87,13 @@ class _HyotalkAppState extends State<HyotalkApp> {
         systemNavigationBarColor: AppColors.black,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
-      child: SafeArea(
-        top: false,
-        child: ScreenUtilInit(
-          designSize: const Size(375, 812),
-          minTextAdapt: true,
-          child: MaterialApp.router(
-            routerConfig: _appRouter.router,
-            debugShowCheckedModeBanner: true,
-            theme: AppTheme.lightTheme,
-          ),
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        minTextAdapt: true,
+        child: MaterialApp.router(
+          routerConfig: _appRouter.router,
+          debugShowCheckedModeBanner: true,
+          theme: AppTheme.lightTheme,
         ),
       ),
     );

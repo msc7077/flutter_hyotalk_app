@@ -64,235 +64,241 @@ class _LoginPageState extends State<LoginPage> {
           final isLoading = state is AuthLoading;
           final isAutoLogin = state is AuthInitial ? state.isAutoLogin : false;
           return Scaffold(
-            body: Stack(
-              children: [
-                SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: context.safeHeight),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(
-                              top: AppDimensions.spacingV60,
-                              bottom: AppDimensions.spacingV25,
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: context.safeHeight),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacingW20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(
+                                top: AppDimensions.spacingV60,
+                                bottom: AppDimensions.spacingV25,
+                              ),
+                              child: Text(AppTexts.login, style: AppTextStyles.text32blackW700),
                             ),
-                            child: Text(AppTexts.login, style: AppTextStyles.text32blackW700),
-                          ),
-                          Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  controller: _idTextEditingController,
-                                  keyboardType: TextInputType.name,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(AppDimensions.radius10),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(AppDimensions.radius10),
-                                      borderSide: const BorderSide(color: AppColors.primary),
-                                    ),
-                                    hintText: AppTexts.id,
-                                    labelText: AppTexts.id,
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return AppTexts.enterId;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: AppDimensions.spacingV20),
-                                TextFormField(
-                                  controller: _passwordTextEditingController,
-                                  obscureText: true,
-                                  enableSuggestions: false,
-                                  keyboardType: TextInputType.visiblePassword,
-                                  autocorrect: false,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(AppDimensions.radius10),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(AppDimensions.radius10),
-                                      borderSide: const BorderSide(color: AppColors.primary),
-                                    ),
-                                    hintText: AppTexts.password,
-                                    labelText: AppTexts.password,
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return AppTexts.enterPassword;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: AppDimensions.spacingV20),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Checkbox(
-                                          side: WidgetStateBorderSide.resolveWith(
-                                            (states) => isAutoLogin
-                                                ? BorderSide(
-                                                    width: AppDimensions.spacingW0_0,
-                                                    color: AppColors.transparent,
-                                                  )
-                                                : BorderSide(
-                                                    width: AppDimensions.spacingW1_5,
-                                                    color: AppColors.black_50_opacity,
-                                                  ),
-                                          ),
-                                          activeColor: isAutoLogin
-                                              ? AppColors.primary
-                                              : AppColors.transparent,
-                                          value: isAutoLogin,
-                                          onChanged: (bool? value) {
-                                            context.read<AuthBloc>().add(
-                                              AutoLoginCheckboxToggled(isAutoLogin: value ?? false),
-                                            );
-                                          },
-                                        ),
-                                        Text(
-                                          AppTexts.autoLogin,
-                                          style: AppTextStyles.text13blackW400.copyWith(
-                                            color: AppColors.grey4A4A4A,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: AppDimensions.spacingV20),
-                                SizedBox(
-                                  width: AppDimensions.buttonWidthFull,
-                                  height: AppDimensions.buttonHeight,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      elevation: AppDimensions.spacingV0_0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(AppDimensions.radius50),
+                            Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    controller: _idTextEditingController,
+                                    keyboardType: TextInputType.name,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(AppDimensions.radius10),
                                       ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(AppDimensions.radius10),
+                                        borderSide: const BorderSide(color: AppColors.primary),
+                                      ),
+                                      hintText: AppTexts.id,
+                                      labelText: AppTexts.id,
                                     ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () async {
-                                            FocusScope.of(context).unfocus();
-                                            if (_formKey.currentState!.validate()) {
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return AppTexts.enterId;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  SizedBox(height: AppDimensions.spacingV20),
+                                  TextFormField(
+                                    controller: _passwordTextEditingController,
+                                    obscureText: true,
+                                    enableSuggestions: false,
+                                    keyboardType: TextInputType.visiblePassword,
+                                    autocorrect: false,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(AppDimensions.radius10),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(AppDimensions.radius10),
+                                        borderSide: const BorderSide(color: AppColors.primary),
+                                      ),
+                                      hintText: AppTexts.password,
+                                      labelText: AppTexts.password,
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return AppTexts.enterPassword;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  SizedBox(height: AppDimensions.spacingV20),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Checkbox(
+                                            side: WidgetStateBorderSide.resolveWith(
+                                              (states) => isAutoLogin
+                                                  ? BorderSide(
+                                                      width: AppDimensions.spacingW0_0,
+                                                      color: AppColors.transparent,
+                                                    )
+                                                  : BorderSide(
+                                                      width: AppDimensions.spacingW1_5,
+                                                      color: AppColors.black_50_opacity,
+                                                    ),
+                                            ),
+                                            activeColor: isAutoLogin
+                                                ? AppColors.primary
+                                                : AppColors.transparent,
+                                            value: isAutoLogin,
+                                            onChanged: (bool? value) {
                                               context.read<AuthBloc>().add(
-                                                LoginRequested(
-                                                  id: _idTextEditingController.text,
-                                                  password: _passwordTextEditingController.text,
-                                                  isAutoLogin: isAutoLogin,
+                                                AutoLoginCheckboxToggled(
+                                                  isAutoLogin: value ?? false,
                                                 ),
                                               );
-                                            }
-                                          },
+                                            },
+                                          ),
+                                          Text(
+                                            AppTexts.autoLogin,
+                                            style: AppTextStyles.text13blackW400.copyWith(
+                                              color: AppColors.grey4A4A4A,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: AppDimensions.spacingV20),
+                                  SizedBox(
+                                    width: AppDimensions.buttonWidthFull,
+                                    height: AppDimensions.buttonHeight,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        elevation: AppDimensions.spacingV0_0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            AppDimensions.radius50,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () async {
+                                              FocusScope.of(context).unfocus();
+                                              if (_formKey.currentState!.validate()) {
+                                                context.read<AuthBloc>().add(
+                                                  LoginRequested(
+                                                    id: _idTextEditingController.text,
+                                                    password: _passwordTextEditingController.text,
+                                                    isAutoLogin: isAutoLogin,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                      child: Text(
+                                        AppTexts.login,
+                                        style: AppTextStyles.text18blackW700.copyWith(
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: AppDimensions.spacingV15),
+                            SizedBox(
+                              width: AppDimensions.buttonWidthFull,
+                              height: AppDimensions.buttonHeight,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  elevation: AppDimensions.spacingV0_0,
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(color: AppColors.orangeEB5E2B),
+                                    borderRadius: BorderRadius.circular(AppDimensions.radius50),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  context.pushNamed(
+                                    AppRouterName.selfCertificationName,
+                                    queryParameters: {'nextRoute': AppRouterName.registerName},
+                                  );
+                                },
+                                child: Text(
+                                  AppTexts.register,
+                                  style: AppTextStyles.text16blackW700.copyWith(
+                                    color: AppColors.orangeEB5E2B,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: AppDimensions.spacingV15),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      context.pushNamed(
+                                        AppRouterName.selfCertificationName,
+                                        queryParameters: {'nextRoute': AppRouterName.findIdName},
+                                      );
+                                    },
                                     child: Text(
-                                      AppTexts.login,
-                                      style: AppTextStyles.text18blackW700.copyWith(
-                                        color: AppColors.white,
+                                      AppTexts.findId,
+                                      style: AppTextStyles.text13blackW400.copyWith(
+                                        color: AppColors.grey888888,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '┃',
+                                  style: AppTextStyles.text12blackW400.copyWith(
+                                    color: AppColors.greyA2A2A2,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      context.pushNamed(
+                                        AppRouterName.selfCertificationName,
+                                        queryParameters: {
+                                          'nextRoute': AppRouterName.resetPasswordName,
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      AppTexts.resetPassword,
+                                      style: AppTextStyles.text13blackW400.copyWith(
+                                        color: AppColors.grey888888,
                                       ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          SizedBox(height: AppDimensions.spacingV15),
-                          SizedBox(
-                            width: AppDimensions.buttonWidthFull,
-                            height: AppDimensions.buttonHeight,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                elevation: AppDimensions.spacingV0_0,
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(color: AppColors.orangeEB5E2B),
-                                  borderRadius: BorderRadius.circular(AppDimensions.radius50),
-                                ),
-                              ),
-                              onPressed: () {
-                                context.pushNamed(
-                                  AppRouterName.selfCertificationName,
-                                  queryParameters: {'nextRoute': AppRouterName.registerName},
-                                );
-                              },
-                              child: Text(
-                                AppTexts.register,
-                                style: AppTextStyles.text16blackW700.copyWith(
-                                  color: AppColors.orangeEB5E2B,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: AppDimensions.spacingV15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                child: TextButton(
-                                  onPressed: () {
-                                    context.pushNamed(
-                                      AppRouterName.selfCertificationName,
-                                      queryParameters: {'nextRoute': AppRouterName.findIdName},
-                                    );
-                                  },
-                                  child: Text(
-                                    AppTexts.findId,
-                                    style: AppTextStyles.text13blackW400.copyWith(
-                                      color: AppColors.grey888888,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '┃',
-                                style: AppTextStyles.text12blackW400.copyWith(
-                                  color: AppColors.greyA2A2A2,
-                                ),
-                              ),
-                              Flexible(
-                                child: TextButton(
-                                  onPressed: () {
-                                    context.pushNamed(
-                                      AppRouterName.selfCertificationName,
-                                      queryParameters: {
-                                        'nextRoute': AppRouterName.resetPasswordName,
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    AppTexts.resetPassword,
-                                    style: AppTextStyles.text13blackW400.copyWith(
-                                      color: AppColors.grey888888,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // 로딩 오버레이
-                if (isLoading)
-                  AbsorbPointer(
-                    child: Container(
-                      color: AppColors.black_50_opacity,
-                      child: const Center(child: AppLoadingIndicator()),
+                  // 로딩 오버레이
+                  if (isLoading)
+                    AbsorbPointer(
+                      child: Container(
+                        color: AppColors.black_50_opacity,
+                        child: const Center(child: AppLoadingIndicator()),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           );
         },
