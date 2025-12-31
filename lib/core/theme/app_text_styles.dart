@@ -44,6 +44,12 @@ class AppTextStyles {
     color: AppColors.black,
     fontFamily: fontFamily,
   );
+  static TextStyle? get text15blackW400 => TextStyle(
+    fontSize: 15.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+    fontFamily: fontFamily,
+  );
   static TextStyle get text16blackW400 => TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,

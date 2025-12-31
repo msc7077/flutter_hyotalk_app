@@ -12,7 +12,6 @@ import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_bloc.da
 import 'package:flutter_hyotalk_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_hyotalk_app/router/app_router_path.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 /// 홈 탭 페이지
@@ -67,6 +66,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 child: _MenuGridCard(
                   items: isAdmin ? _HomeMenus.admin(context) : _HomeMenus.caregiver(context),
                   crossAxisCount: 4,
+                  fixedItemCount: 8,
                 ),
               ),
 
@@ -296,13 +296,18 @@ class _HomeMenus {
 }
 
 class _MenuGridCard extends StatelessWidget {
-  const _MenuGridCard({required this.items, required this.crossAxisCount});
+  const _MenuGridCard({required this.items, required this.crossAxisCount, this.fixedItemCount});
 
   final List<_MenuItem> items;
   final int crossAxisCount;
+  final int? fixedItemCount;
 
   @override
   Widget build(BuildContext context) {
+    final totalCount = fixedItemCount == null
+        ? items.length
+        : fixedItemCount!.clamp(items.length, 999);
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 8.w),
       decoration: BoxDecoration(
@@ -312,33 +317,51 @@ class _MenuGridCard extends StatelessWidget {
           BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, 4)),
         ],
       ),
-      child: GridView.count(
-        crossAxisCount: crossAxisCount,
+      child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        childAspectRatio: 1.0,
-        children: items.map((item) {
+        itemCount: totalCount,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          // 정사각(1:1)로 두면 60(원) + 텍스트가 셀을 넘쳐 overflow가 발생하기 쉬움
+          // → Figma 기준(원 60 + 텍스트 영역)으로 셀 높이를 고정해 안정적으로 렌더링
+          mainAxisExtent: 104.h,
+        ),
+        itemBuilder: (context, index) {
+          if (index >= items.length) return const SizedBox.shrink();
+          final item = items[index];
           return InkWell(
             onTap: item.onTap,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                CircleAvatar(
-                  radius: 22.r,
-                  backgroundColor: AppColors.greyF5F5F5,
-                  child: SvgPicture.asset(
+                Container(
+                  width: 60.w,
+                  height: 60.w,
+                  decoration: const BoxDecoration(
+                    color: AppColors.greyF3F3F3,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Image.asset(
                     item.iconAsset,
-                    width: 22.sp,
-                    height: 22.sp,
-                    colorFilter: const ColorFilter.mode(AppColors.grey4A4A4A, BlendMode.srcIn),
+                    width: 37.w,
+                    height: 37.w,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
                   ),
                 ),
                 SizedBox(height: 8.h),
-                Text(item.label, style: AppTextStyles.text12blackW400.copyWith(height: 1.2)),
+                Text(
+                  item.label,
+                  style: AppTextStyles.text15blackW400,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           );
-        }).toList(),
+        },
       ),
     );
   }

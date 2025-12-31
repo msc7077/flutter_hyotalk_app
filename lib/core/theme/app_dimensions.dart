@@ -55,6 +55,7 @@ class AppDimensions {
   static double get iconSmall => 16.sp;
   static double get iconMedium => 24.sp;
   static double get iconLarge => 32.sp;
+  static double get iconMenu => 60.sp;
 
   // 버튼 크기
   static double get buttonWidthFull => double.infinity; // 버튼 너비를 화면 너비로 고정
